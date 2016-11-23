@@ -1,8 +1,8 @@
 package data;
 
 import java.sql.*;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+
+import javax.swing.JOptionPane;
 
 public class FactoryConexion {
 private Connection conn;
@@ -11,7 +11,7 @@ private Connection conn;
 	
 	private String dbType="ucanaccess";
 	private String dbDriver="net.ucanaccess.jdbc.UcanaccessDriver";
-	private String host="C:/Users/Ezequiel/desktop/Nueva carpeta/base.mdb";
+	private String host="C:/Proyectos/gerardo/base.mdb";
 	private String user="";
 	private String pass="";
 	private String db="";
@@ -24,6 +24,7 @@ private Connection conn;
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, "Error de base de datos.");
 		}
 	}
 	

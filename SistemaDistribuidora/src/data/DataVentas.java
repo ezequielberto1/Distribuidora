@@ -8,7 +8,9 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 
-import org.apache.commons.lang3.StringUtils;
+
+
+import org.apache.commons.lang.StringUtils;
 
 import entidades.Articulo_Venta;
 import entidades.Venta;

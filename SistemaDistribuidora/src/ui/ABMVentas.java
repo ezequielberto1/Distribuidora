@@ -492,6 +492,13 @@ public class ABMVentas {
 		
 		return venta;
 	}
+	
+	public boolean esNumero(String s){
+		boolean b=false;
+		if (s.matches("[0-9]+"))
+			b=true;
+		return b;			
+	}
 }
 	
 	

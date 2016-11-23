@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.3.0.final using JasperReports Library version 6.3.0  -->
-<!-- 2016-10-11T21:56:01 -->
+<!-- 2016-11-03T18:29:52 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReporteVentas" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="1c7c6cdf-3793-4808-9e6c-e61f9c998be7">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Base MSAccess"/>
@@ -50,19 +50,19 @@ order by articulos.rubro asc, ventasfinal.codart asc]]>
 		<variableExpression><![CDATA[$F{SubtotalGanancia}]]></variableExpression>
 		<initialValueExpression><![CDATA[BigDecimal.valueOf(0)]]></initialValueExpression>
 	</variable>
-	<variable name="TotalCosto" class="java.math.BigDecimal" calculation="Sum">
+	<variable name="TotalCosto" class="java.math.BigDecimal" incrementType="Group" incrementGroup="marcaGRP" calculation="Sum">
 		<variableExpression><![CDATA[$V{CostoMarca}]]></variableExpression>
 		<initialValueExpression><![CDATA[BigDecimal.valueOf(0)]]></initialValueExpression>
 	</variable>
-	<variable name="TotalVenta" class="java.math.BigDecimal" calculation="Sum">
+	<variable name="TotalVenta" class="java.math.BigDecimal" incrementType="Group" incrementGroup="marcaGRP" calculation="Sum">
 		<variableExpression><![CDATA[$V{VentaMarca}]]></variableExpression>
 		<initialValueExpression><![CDATA[BigDecimal.valueOf(0)]]></initialValueExpression>
 	</variable>
-	<variable name="TotalGanancia" class="java.math.BigDecimal" calculation="Sum">
+	<variable name="TotalGanancia" class="java.math.BigDecimal" incrementType="Group" incrementGroup="marcaGRP" calculation="Sum">
 		<variableExpression><![CDATA[$V{GananciaMarca}]]></variableExpression>
 		<initialValueExpression><![CDATA[BigDecimal.valueOf(0)]]></initialValueExpression>
 	</variable>
-	<variable name="Comision" class="java.lang.Number">
+	<variable name="Comision" class="java.lang.Number" incrementType="Report">
 		<variableExpression><![CDATA[PRODUCT($P{porcentaje_comision},$V{TotalVenta})]]></variableExpression>
 	</variable>
 	<group name="marcaGRP">
