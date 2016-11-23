@@ -509,9 +509,18 @@ public class EditarArticulosVenta {
 	public void eliminarArticulo(){
 		int cod_art = (Integer)(tblArticulosVenta.getValueAt(tblArticulosVenta.getSelectedRow(), 0));
 		articulos_eliminar.add(cod_art);
+		//Eliminar de modificados
+		for (int i = 0; i < articulos_modificar.size(); i++) {
+			if(cod_art==articulos_modificar.get(i).getCodigo())
+				articulos_modificar.remove(i);
+			}
+		//Eliminar de agregados
+		for (int i = 0; i < articulos_agregar.size(); i++) {
+			if(cod_art==articulos_agregar.get(i).getCodigo())
+				articulos_agregar.remove(i);
+			}
 		removeFila();
 		JOptionPane.showMessageDialog(null, "Eliminación exitosa.");
-		//Validar cuando se modifica un articulo y luego se elimina; si se agrega y se elimina a la vez; etc
 	}
 
 	public void addFila(Vector<Object> v){
