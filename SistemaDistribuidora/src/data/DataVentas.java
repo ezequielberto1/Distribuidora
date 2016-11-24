@@ -316,6 +316,25 @@ public class DataVentas {
 				stmt.execute();
 			}
 			
+			//Agregar articulos
+			for (int i = 0; i < aa.size(); i++) {
+				stmt= FactoryConexion.getInstancia().getConn().prepareStatement("insert into ventasfinal "
+						+ "(numventa, fecha, apenom, domicilio, localidad, iva, codart, descripcion, costo "
+						+ "subtotalcosto, ganancia) values(?,?,?,?,?,?,?,?,?,?,?)");
+				stmt.setInt(1, v.getNro());
+				stmt.setDate(2, new java.sql.Date(v.getFecha().getTime()));
+				stmt.setString(3, v.getCliente());
+				stmt.setString(4, domicilio);
+				stmt.setString(5, localidad);
+				stmt.setString(6, v.getZona());
+				stmt.setInt(7, aa.get(i).getCodigo());
+				stmt.setString(8, aa.get(i).getNombre());
+				stmt.setFloat(9, aa.get(i).getCosto());
+				stmt.setFloat(10, aa.get(i).getPrecio());
+				stmt.setFloat(11,aa.get(i).getSubtotalcosto());
+				stmt.setFloat(12, (aa.get(i).getSubtotalventa()-aa.get(i).getSubtotalcosto()));
+			}
+			
 			//Modificar articulos
 			for (int i = 0; i < am.size(); i++) {
 				//Primero los elimino
@@ -343,24 +362,7 @@ public class DataVentas {
 				stmt.setFloat(12, (am.get(i).getSubtotalventa()-am.get(i).getSubtotalcosto()));
 			}
 			
-			//Agregar articulos
-			for (int i = 0; i < aa.size(); i++) {
-				stmt= FactoryConexion.getInstancia().getConn().prepareStatement("insert into ventasfinal "
-						+ "(numventa, fecha, apenom, domicilio, localidad, iva, codart, descripcion, costo "
-						+ "subtotalcosto, ganancia) values(?,?,?,?,?,?,?,?,?,?,?)");
-				stmt.setInt(1, v.getNro());
-				stmt.setDate(2, new java.sql.Date(v.getFecha().getTime()));
-				stmt.setString(3, v.getCliente());
-				stmt.setString(4, domicilio);
-				stmt.setString(5, localidad);
-				stmt.setString(6, v.getZona());
-				stmt.setInt(7, aa.get(i).getCodigo());
-				stmt.setString(8, aa.get(i).getNombre());
-				stmt.setFloat(9, aa.get(i).getCosto());
-				stmt.setFloat(10, aa.get(i).getPrecio());
-				stmt.setFloat(11,aa.get(i).getSubtotalcosto());
-				stmt.setFloat(12, (aa.get(i).getSubtotalventa()-aa.get(i).getSubtotalcosto()));
-			}
+			
 
 		} 
 		catch (SQLException e) {

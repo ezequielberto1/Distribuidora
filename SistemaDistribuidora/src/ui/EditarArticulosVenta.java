@@ -344,10 +344,6 @@ public class EditarArticulosVenta {
 	}
 
 	public void show(boolean b){
-		if (b){
-			DataVentas dv = new DataVentas();
-			dv.cargarDetalleVenta(tblArticulosVenta, nro_venta);
-		}
 		this.frame.setVisible(b);
 	}
 
@@ -578,6 +574,7 @@ public class EditarArticulosVenta {
 			abmv.setArticulosModificar(articulos_modificar);
 		if(!articulos_eliminar.isEmpty())
 			abmv.setArticulosEliminar(articulos_eliminar);
+		abmv.setArticulosVenta(tblArticulosVenta);
 	}
 
 	public JTable getTabla(){
@@ -608,5 +605,27 @@ public class EditarArticulosVenta {
 		if (s.matches("[0-9]+"))
 			b=true;
 		return b;			
+	}
+	
+	public void setArticulosVenta(JTable tabla){
+		tblArticulosVenta.setModel(tabla.getModel());
+		TableColumnModel m = tblArticulosVenta.getColumnModel();
+		m.getColumn(2).setCellRenderer(NumberRenderer.getCurrencyRenderer());
+		m.getColumn(3).setCellRenderer(NumberRenderer.getCurrencyRenderer());
+		m.getColumn(5).setCellRenderer(NumberRenderer.getCurrencyRenderer());
+		m.getColumn(6).setCellRenderer(NumberRenderer.getCurrencyRenderer());
+		m.getColumn(7).setCellRenderer(NumberRenderer.getCurrencyRenderer());
+	}
+	
+	public void setAA(ArrayList<Articulo_Venta> aa) {
+		articulos_agregar = aa;
+	}
+	
+	public void setAM(ArrayList<Articulo_Venta> am) {
+		articulos_modificar = am;
+	}
+	
+	public void setAE(ArrayList<Integer> ae) {
+		articulos_eliminar = ae;
 	}
 }

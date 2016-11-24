@@ -75,8 +75,6 @@ public class ABMVentas {
 	private JButton button_5;
 	private JButton button_6;
 	private JButton button;
-	private JButton button_2;
-	private JButton button_3;
 	private JButton btnGuardarCambios;
 	private JLabel lblCodigo;
 	private JLabel lblFecha;
@@ -92,6 +90,7 @@ public class ABMVentas {
 	private ArrayList<Articulo_Venta> articulos_modificar = new ArrayList<Articulo_Venta>();
 	private ArrayList<Integer> articulos_eliminar = new ArrayList<Integer>();
 	private int seleccionado;
+	private int ventaActual;
 
 
 
@@ -168,18 +167,12 @@ public class ABMVentas {
 		
 		cmbZona = new JComboBox();
 		
-		lblCampoSlo = new JLabel("(*) Campo s\u00F3lo para b\u00FAsqueda. \r\nAl agregar una venta, el N\u00BA es autogenerado.");
+		lblCampoSlo = new JLabel("(*) Campo s\u00F3lo para b\u00FAsqueda.");
 		lblCampoSlo.setFont(new Font("Tahoma", Font.ITALIC, 8));
 		
 		scrListaClientes = new JScrollPane();
 		
 		button_1 = new JButton("Buscar");
-		
-		button_2 = new JButton("Agregar");
-		buttonGroup_1.add(button_2);
-		
-		button_3 = new JButton("Eliminar");
-		buttonGroup_1.add(button_3);
 		
 		btnGuardarCambios = new JButton("Guardar cambios");
 		btnGuardarCambios.addActionListener(new ActionListener() {
@@ -220,11 +213,7 @@ public class ABMVentas {
 		
 		tblListaVentas = new JTable();
 		tblListaVentas.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		tblListaVentas.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
-	        public void valueChanged(ListSelectionEvent event) {
-	        	seleccionarVenta();
-	        }
-	    });
+		
 		
 		scrListaClientes.setViewportView(tblListaVentas);
 		
@@ -266,6 +255,8 @@ public class ABMVentas {
 				GenerarReporteVentas.main(null);
 			}
 		});
+		
+		JButton button_2 = new JButton("Eliminar");
 		GroupLayout groupLayout = new GroupLayout(frmGestionVentas.getContentPane());
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
@@ -275,25 +266,24 @@ public class ABMVentas {
 						.addGroup(groupLayout.createSequentialGroup()
 							.addComponent(scrListaClientes, GroupLayout.DEFAULT_SIZE, 332, Short.MAX_VALUE)
 							.addGap(6)
-							.addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
-								.addGroup(Alignment.TRAILING, groupLayout.createSequentialGroup()
+							.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING, false)
+								.addComponent(panel, GroupLayout.PREFERRED_SIZE, 378, GroupLayout.PREFERRED_SIZE)
+								.addGroup(Alignment.LEADING, groupLayout.createSequentialGroup()
 									.addPreferredGap(ComponentPlacement.RELATED)
-									.addComponent(button_1, GroupLayout.PREFERRED_SIZE, 176, GroupLayout.PREFERRED_SIZE)
-									.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-									.addComponent(button_5, GroupLayout.PREFERRED_SIZE, 177, GroupLayout.PREFERRED_SIZE)
-									.addPreferredGap(ComponentPlacement.RELATED))
-								.addComponent(panel, Alignment.TRAILING, GroupLayout.PREFERRED_SIZE, 378, GroupLayout.PREFERRED_SIZE)))
+									.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+										.addGroup(groupLayout.createSequentialGroup()
+											.addComponent(btnGuardarCambios, GroupLayout.PREFERRED_SIZE, 177, GroupLayout.PREFERRED_SIZE)
+											.addPreferredGap(ComponentPlacement.RELATED, 25, Short.MAX_VALUE)
+											.addComponent(button_2, GroupLayout.PREFERRED_SIZE, 176, GroupLayout.PREFERRED_SIZE))
+										.addGroup(groupLayout.createSequentialGroup()
+											.addComponent(button_1, GroupLayout.PREFERRED_SIZE, 176, GroupLayout.PREFERRED_SIZE)
+											.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+											.addComponent(button_5, GroupLayout.PREFERRED_SIZE, 177, GroupLayout.PREFERRED_SIZE)))
+									.addPreferredGap(ComponentPlacement.RELATED))))
 						.addGroup(groupLayout.createSequentialGroup()
 							.addComponent(button_6)
 							.addGap(10)
-							.addComponent(button, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED, 158, Short.MAX_VALUE)
-							.addComponent(button_2, GroupLayout.PREFERRED_SIZE, 119, GroupLayout.PREFERRED_SIZE)
-							.addGap(14)
-							.addComponent(button_3, GroupLayout.PREFERRED_SIZE, 119, GroupLayout.PREFERRED_SIZE)
-							.addGap(10)
-							.addComponent(btnGuardarCambios, GroupLayout.PREFERRED_SIZE, 116, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)))
+							.addComponent(button, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)))
 					.addGap(10))
 				.addGroup(groupLayout.createSequentialGroup()
 					.addContainerGap()
@@ -323,9 +313,9 @@ public class ABMVentas {
 							.addComponent(btnAplicarFecha, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE))
 						.addComponent(btnReporte))
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
 						.addComponent(scrListaClientes, GroupLayout.DEFAULT_SIZE, 471, Short.MAX_VALUE)
-						.addGroup(Alignment.TRAILING, groupLayout.createSequentialGroup()
+						.addGroup(groupLayout.createSequentialGroup()
 							.addGap(1)
 							.addComponent(panel, GroupLayout.DEFAULT_SIZE, 436, Short.MAX_VALUE)
 							.addPreferredGap(ComponentPlacement.UNRELATED)
@@ -335,14 +325,15 @@ public class ABMVentas {
 					.addGap(11)
 					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
 						.addComponent(button_6)
-						.addComponent(button)
-						.addComponent(button_2)
-						.addComponent(button_3)
-						.addComponent(btnGuardarCambios))
+						.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+							.addComponent(button)
+							.addComponent(btnGuardarCambios)
+							.addComponent(button_2)))
 					.addContainerGap())
 		);
 		
 		JButton btnEditar = new JButton("Editar...");
+		btnEditar.setEnabled(false);
 		btnEditar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				editarArticulosVenta();
@@ -375,10 +366,10 @@ public class ABMVentas {
 							.addComponent(cmbZona, GroupLayout.PREFERRED_SIZE, 209, GroupLayout.PREFERRED_SIZE))
 						.addGroup(gl_panel.createSequentialGroup()
 							.addGap(4)
-							.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING)
+							.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING, false)
 								.addGroup(gl_panel.createSequentialGroup()
 									.addComponent(lblCampoSlo)
-									.addPreferredGap(ComponentPlacement.UNRELATED)
+									.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 									.addComponent(btnEditar))
 								.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 358, GroupLayout.PREFERRED_SIZE))))
 					.addGap(4))
@@ -418,14 +409,23 @@ public class ABMVentas {
 		);
 		panel.setLayout(gl_panel);
 		frmGestionVentas.getContentPane().setLayout(groupLayout);
+		
+		tblListaVentas.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
+	        public void valueChanged(ListSelectionEvent event) {
+	        	seleccionarVenta();
+	        	btnEditar.setEnabled(true);
+	        }
+	    });
 
 	}
 	
 	public void editarArticulosVenta(){
-		int nro_venta;
 		EditarArticulosVenta eav = new EditarArticulosVenta();
-        nro_venta = (Integer)(tblListaVentas.getValueAt(tblListaVentas.getSelectedRow(), 1));
-		eav.setNroVenta(nro_venta);
+		eav.setArticulosVenta(tblArticulosVenta);
+		eav.setNroVenta(ventaActual);
+		eav.setAA(articulos_agregar);
+		eav.setAM(articulos_modificar);
+		eav.setAE(articulos_eliminar);
 		eav.setCaller(this);
 		eav.show(true);
 	}
@@ -434,12 +434,16 @@ public class ABMVentas {
 		DataVentas dv = new DataVentas();
     	int nro_venta;
         nro_venta = (Integer)(tblListaVentas.getValueAt(tblListaVentas.getSelectedRow(), 1));
+        ventaActual = nro_venta;
         Venta v = dv.getVenta(nro_venta);
         txtNroVenta.setText(Integer.toString(v.getNro()));
         txtCliente.setText(v.getCliente());
         dateFechaVenta.setDate(v.getFecha());
         cmbZona.setSelectedItem(v.getZona());
         dv.cargarDetalleVenta(tblArticulosVenta, v.getNro());
+        articulos_agregar = new ArrayList<Articulo_Venta>();
+    	articulos_modificar = new ArrayList<Articulo_Venta>();
+    	articulos_eliminar = new ArrayList<Integer>();
 	}
 	
 	public void setArticulosEliminar(ArrayList<Integer> ae){
@@ -478,14 +482,15 @@ public class ABMVentas {
 	
 	public void eliminarVenta() {
 		DataVentas dv = new DataVentas();
-			Venta v = mapearDeFormulario();
+		Venta v = mapearDeFormulario();
+		if(JOptionPane.showConfirmDialog(frmGestionVentas, "¿Desea eliminar venta Nº " + v.getNro() + "?") == 1)
 			dv.deleteVenta(v);
 	}
 	
 	public Venta mapearDeFormulario(){
 		Venta venta = new Venta();
 		
-		venta.setNro(Integer.parseInt(txtNroVenta.getText()));
+		venta.setNro(ventaActual);
 		venta.setCliente(txtCliente.getText());
 		venta.setFecha(dateFechaVenta.getDate());
 		venta.setZona((String)cmbZona.getSelectedItem());
@@ -498,6 +503,10 @@ public class ABMVentas {
 		if (s.matches("[0-9]+"))
 			b=true;
 		return b;			
+	}
+	
+	public void setArticulosVenta(JTable tabla){
+		tblArticulosVenta = tabla;
 	}
 }
 	
