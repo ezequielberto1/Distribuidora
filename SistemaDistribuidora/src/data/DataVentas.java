@@ -35,10 +35,11 @@ public class DataVentas {
 
 			stmt = FactoryConexion.getInstancia().getConn().prepareStatement("SELECT ventasfinal.[fecha] as Fecha, ventasfinal.[numventa] as Vta, "
 					+ "ventasfinal.[codcli] as CodCli, ventasfinal.[apenom] as Cliente, ventasfinal.[localidad] as Localidad, ventasfinal.[iva] as Zona, "
-					+ "sum(ventasfinal.[subtotalcosto]) as SubtotalCosto, sum((ventasfinal.[cantidad]*articulos.[lista1])) as SubtotalVenta, sum(ventasfinal.[ganancia]) as Ganancia "
+					+ "sum(ventasfinal.costo*ventasfinal.subtotal/ventasfinal.monto) as SubtotalCosto, sum(ventasfinal.[subtotal]) as SubtotalVenta, "
+					+ "sum(ventasfinal.subtotal-ventasfinal.costo*ventasfinal.subtotal/ventasfinal.monto) as Ganancia "
 					+ "FROM ventasfinal INNER JOIN articulos ON ventasfinal.[codart]=articulos.[codigo] "
 					+ "WHERE ((ventasfinal.[fecha]) BETWEEN ? AND ?) AND (articulos.[rubro] IN (?)) AND (ventasfinal.[iva] IN (?)) "
-					+ "GROUP BY ventasfinal.[fecha], ventasfinal.[numventa], vendedores.[nombre], "
+					+ "GROUP BY ventasfinal.[fecha], ventasfinal.[numventa], "
 					+ "ventasfinal.[codcli], ventasfinal.[apenom], ventasfinal.[localidad], ventasfinal.[iva]");
 			stmt.setDate(1, fd);
 			stmt.setDate(2, fh);
@@ -74,10 +75,10 @@ public class DataVentas {
 		try {
 
 			stmt = FactoryConexion.getInstancia().getConn().prepareStatement("SELECT ventasfinal.[codart] as Codigo, ventasfinal.[descripcion] as Descripcion, "
-					+ "ventasfinal.[costo] as CostoU, articulos.[lista1] as PrecioU, ventasfinal.[cantidad] as Cantidad, ventasfinal.[subtotalcosto], "
-					+ "ventasfinal.[cantidad]*articulos.[lista1] as SubtotalVenta, ventasfinal.[ganancia] "
+					+ "ventasfinal.[costo] as CostoU, ventasfinal.[monto] as PrecioU, ventasfinal.[subtotal]/ventasfinal.[monto] as Cantidad, "
+					+ "ventasfinal.costo*ventasfinal.subtotal/ventasfinal.monto as SubtotalCosto, "
+					+ "ventasfinal.[subtotal] as SubtotalVenta, ventasfinal.subtotal-ventasfinal.costo*ventasfinal.subtotal/ventasfinal.monto as Ganancia "
 					+ "FROM ventasfinal "
-					+ "INNER JOIN articulos ON ventasfinal.[codart]=articulos.[codigo] "
 					+ "WHERE ventasfinal.numventa = ?");
 			stmt.setInt(1, nro_venta);
 			rs = stmt.executeQuery();
@@ -117,10 +118,10 @@ public class DataVentas {
 		try {
 
 			stmt = FactoryConexion.getInstancia().getConn().prepareStatement("SELECT ventasfinal.[codart] as Codigo, ventasfinal.[descripcion] as Descripcion, "
-					+ "ventasfinal.[costo] as CostoU, articulos.[lista1] as PrecioU, ventasfinal.[cantidad] as Cantidad, ventasfinal.[subtotalcosto], "
-					+ "ventasfinal.[cantidad]*articulos.[lista1] as SubtotalVenta, ventasfinal.[ganancia] "
+					+ "ventasfinal.[costo] as CostoU, ventasfinal.[monto] as PrecioU, ventasfinal.[subtotal]/ventasfinal.[monto] as Cantidad, "
+					+ "ventasfinal.costo*ventasfinal.subtotal/ventasfinal.monto as SubtotalCosto, "
+					+ "ventasfinal.[subtotal] as SubtotalVenta, ventasfinal.subtotal-ventasfinal.costo*ventasfinal.subtotal/ventasfinal.monto as Ganancia "
 					+ "FROM ventasfinal "
-					+ "INNER JOIN articulos ON ventasfinal.[codart]=articulos.[codigo] "
 					+ "WHERE ventasfinal.numventa = ?");
 			stmt.setInt(1, nro_venta);
 			rs = stmt.executeQuery();
@@ -157,6 +158,55 @@ public class DataVentas {
 		return w;
 
 	}
+	
+	public ArrayList<Articulo_Venta> getArticulosVenta(int nro_venta) {
+		PreparedStatement stmt=null;
+		ResultSet rs=null;
+		ArrayList<Articulo_Venta> av = new ArrayList<Articulo_Venta>();
+
+		try {
+
+			stmt = FactoryConexion.getInstancia().getConn().prepareStatement("SELECT ventasfinal.[codart] as Codigo, ventasfinal.[descripcion] as Descripcion, "
+					+ "ventasfinal.[costo] as CostoU, ventasfinal.[monto] as PrecioU, ventasfinal.[subtotal]/ventasfinal.[monto] as Cantidad, "
+					+ "ventasfinal.costo*ventasfinal.subtotal/ventasfinal.monto as SubtotalCosto, "
+					+ "ventasfinal.[subtotal] as SubtotalVenta, ventasfinal.subtotal-ventasfinal.costo*ventasfinal.subtotal/ventasfinal.monto as Ganancia "
+					+ "FROM ventasfinal "
+					+ "WHERE ventasfinal.numventa = ?");
+			stmt.setInt(1, nro_venta);
+			rs = stmt.executeQuery();
+			while (rs.next()){
+				Articulo_Venta art = new Articulo_Venta();
+				art.setCodigo(rs.getInt(1));
+				art.setNombre(rs.getString(2));
+				art.setCosto(rs.getFloat(3));
+				art.setPrecio(rs.getFloat(4));
+				art.setCantidad(rs.getFloat(5));
+				art.setSubtotalcosto(rs.getFloat(6));
+				art.setSubtotalventa(rs.getFloat(7));
+				av.add(art);
+			}
+
+
+		} catch (SQLException ex) {
+
+			System.out.println("SQLException: " + ex.getMessage());
+			ex.printStackTrace();
+
+
+		}
+		finally{
+			try {
+				if (rs!=null)
+					rs.close();
+				if (stmt!=null)stmt.close();				
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+
+		return av;
+
+	}
 
 	public void cargarListaVentasDefault(JTable tabla, java.util.Date fechaDesde, java.util.Date fechaHasta) {
 		PreparedStatement stmt=null;
@@ -169,10 +219,11 @@ public class DataVentas {
 
 			stmt = FactoryConexion.getInstancia().getConn().prepareStatement("SELECT ventasfinal.[fecha] as Fecha, ventasfinal.[numventa] as Vta, "
 					+ "ventasfinal.[codcli] as CodCli, ventasfinal.[apenom] as Cliente, ventasfinal.[localidad] as Localidad, ventasfinal.[iva] as Zona, "
-					+ "sum(ventasfinal.[subtotalcosto]) as SubtotalCosto, sum((ventasfinal.[cantidad]*articulos.[lista1])) as SubtotalVenta, sum(ventasfinal.[ganancia]) as Ganancia "
-					+ "FROM ventasfinal INNER JOIN articulos ON ventasfinal.[codart]=articulos.[codigo] "
+					+ "sum(ventasfinal.[costo]*ventasfinal.[subtotal]/ventasfinal.[monto]) as SubtotalCosto, sum(ventasfinal.[subtotal]) as SubtotalVenta, "
+					+ "sum(ventasfinal.[subtotal]-ventasfinal.[costo]*ventasfinal.[subtotal]/ventasfinal.[monto]) as Ganancia "
+					+ "FROM ventasfinal "
 					+ "WHERE ventasfinal.[fecha] BETWEEN ? AND ? "
-					+ "GROUP BY ventasfinal.[numventa], ventasfinal.[fecha], "
+					+ "GROUP BY ventasfinal.[fecha], ventasfinal.[numventa], "
 					+ "ventasfinal.[codcli], ventasfinal.[apenom], ventasfinal.[localidad], ventasfinal.[iva]");
 			stmt.setDate(1, fd);
 			stmt.setDate(2, fh);
@@ -252,10 +303,10 @@ public class DataVentas {
 		try {
 
 			stmt = FactoryConexion.getInstancia().getConn().prepareStatement("SELECT ventasfinal.[codart] as Codigo, ventasfinal.[descripcion] as Descripcion, "
-					+ "ventasfinal.[costo] as CostoU, articulos.[lista1] as PrecioU, ventasfinal.[cantidad] as Cantidad, ventasfinal.[subtotalcosto], "
-					+ "ventasfinal.[cantidad]*articulos.[lista1] as SubtotalVenta, ventasfinal.[ganancia] "
+					+ "ventasfinal.[costo] as CostoU, ventasfinal.[monto] as PrecioU, ventasfinal.[subtotal]/ventasfinal.[monto] as Cantidad, "
+					+ "ventasfinal.costo*ventasfinal.subtotal/ventasfinal.monto as SubtotalCosto, "
+					+ "ventasfinal.[subtotal] as SubtotalVenta, ventasfinal.subtotal-ventasfinal.costo*ventasfinal.subtotal/ventasfinal.monto as Ganancia "
 					+ "FROM ventasfinal "
-					+ "INNER JOIN articulos ON ventasfinal.[codart]=articulos.[codigo] "
 					+ "WHERE ventasfinal.numventa = ? AND ventasfinal.codart = ?");
 			stmt.setInt(1, nro_venta);
 			stmt.setInt(2, codigo);

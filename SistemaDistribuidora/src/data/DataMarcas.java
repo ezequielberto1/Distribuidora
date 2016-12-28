@@ -62,6 +62,37 @@ public class DataMarcas {
 
 	}
 	
+	public Vector<Object> getMarcas(){
+			
+			Statement stmt=null;
+			ResultSet rs=null;
+			Vector<Object> marcas = new Vector<Object>();
+			
+			try {
+	
+				stmt = FactoryConexion.getInstancia().getConn().createStatement();
+				rs = stmt.executeQuery("select rubro from rubro order by rubro asc");
+				while(rs.next())
+					marcas.add(rs.getObject(1));
+			} catch (SQLException ex) {
+	
+				System.out.println("SQLException: " + ex.getMessage());
+	
+			}
+			finally{
+				try {
+					if (rs!=null)
+						rs.close();
+					if (stmt!=null)stmt.close();				
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			
+			return marcas;
+			
+		}
+	
 	public void getMarcas(JTable tabla) {
 		Statement stmt=null;
 		ResultSet rs=null;

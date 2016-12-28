@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.3.0.final using JasperReports Library version 6.3.0  -->
-<!-- 2016-10-11T22:19:23 -->
+<!-- 2016-12-11T18:35:39 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PedidosPorZona" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="b530b82f-1c39-4b70-8984-e706ab646d1b">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Base MSAccess"/>
@@ -8,56 +8,17 @@
 	<parameter name="zonasString" class="java.lang.String"/>
 	<parameter name="zonas" class="java.util.Collection" nestedType="java.lang.String"/>
 	<queryString>
-		<![CDATA[select iva, codart, descripcion, cantidad
-from pedidos
-where fecha = $P{fecha} and $X{IN,iva,zonas}
-group by iva, codart, descripcion, cantidad
-order by iva asc]]>
+		<![CDATA[SELECT ventasfinal.codart AS CodArt,
+	ventasfinal.descripcion AS Descripcion,
+	sum(ventasfinal.subtotal/ventasfinal.monto) AS Cantidad
+FROM ventasfinal
+WHERE ventasfinal.fecha = $P{fecha} and $X{IN,ventasfinal.iva,zonas}
+group by ventasfinal.codart, ventasfinal.descripcion
+order by ventasfinal.codart asc]]>
 	</queryString>
-	<field name="iva" class="java.lang.String"/>
-	<field name="codart" class="java.lang.Integer"/>
-	<field name="descripcion" class="java.lang.String"/>
-	<field name="cantidad" class="java.lang.Integer"/>
-	<group name="zonaGroup">
-		<groupExpression><![CDATA[$F{iva}]]></groupExpression>
-		<groupHeader>
-			<band height="62">
-				<textField>
-					<reportElement x="10" y="0" width="540" height="30" uuid="6fdcf35d-96fe-4ec7-9d60-3bbcc7ed57b9">
-						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
-					</reportElement>
-					<textElement textAlignment="Left" verticalAlignment="Middle">
-						<font size="12" isBold="true"/>
-					</textElement>
-					<textFieldExpression><![CDATA[$F{iva}]]></textFieldExpression>
-				</textField>
-				<staticText>
-					<reportElement x="30" y="32" width="50" height="30" uuid="787f932a-d849-4579-835b-6e8694516fc6">
-						<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
-					</reportElement>
-					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font isBold="true"/>
-					</textElement>
-					<text><![CDATA[Cod. Art.]]></text>
-				</staticText>
-				<staticText>
-					<reportElement x="100" y="32" width="360" height="30" uuid="3da0b848-4fa6-4308-821f-e0ef80bdd2f2"/>
-					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font isBold="true"/>
-					</textElement>
-					<text><![CDATA[Descripcion]]></text>
-				</staticText>
-				<staticText>
-					<reportElement x="480" y="32" width="50" height="30" uuid="0b4ba2db-55d0-48a8-9b7c-d10366525c1d"/>
-					<box padding="0"/>
-					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font isBold="true"/>
-					</textElement>
-					<text><![CDATA[Cantidad]]></text>
-				</staticText>
-			</band>
-		</groupHeader>
-	</group>
+	<field name="CodArt" class="java.lang.Integer"/>
+	<field name="Descripcion" class="java.lang.String"/>
+	<field name="Cantidad" class="java.math.BigDecimal"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -92,33 +53,47 @@ order by iva asc]]>
 			</textField>
 		</band>
 	</title>
+	<columnHeader>
+		<band height="30">
+			<staticText>
+				<reportElement x="30" y="0" width="50" height="30" uuid="1f9fa908-c36e-4f54-878a-9370fe9e756b">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Cod. Art.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="100" y="0" width="360" height="30" uuid="7562801f-3d0d-443f-a470-91c5873caf07"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Descripcion]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="480" y="0" width="50" height="30" uuid="19636ba6-8ac1-4017-b939-93828f7458bf"/>
+				<box padding="0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Cantidad]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
 	<detail>
 		<band height="20" splitType="Stretch">
 			<textField>
-				<reportElement x="30" y="0" width="50" height="20" uuid="d9cbda09-eb36-4936-ba6d-46c546d2dc8d">
-					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
-				</reportElement>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="9"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{codart}]]></textFieldExpression>
+				<reportElement x="100" y="0" width="360" height="20" uuid="854ee4ad-bb81-4cf6-a3a5-d85ee31fb475"/>
+				<textFieldExpression><![CDATA[$F{Descripcion}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.000;¤-#,###0.000">
+				<reportElement x="480" y="0" width="50" height="20" uuid="29ecfe68-4c03-4d69-b8c6-15c26280b6b3"/>
+				<textFieldExpression><![CDATA[$F{Cantidad}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="100" y="0" width="360" height="20" uuid="800ee955-b03f-4b75-bbc3-6fdfc8ae2786"/>
-				<textElement verticalAlignment="Middle">
-					<font size="9"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{descripcion}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="480" y="0" width="50" height="20" uuid="ccff1d98-bfb3-43aa-8089-f88b7a646f8c">
-					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
-				</reportElement>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="9"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{cantidad}]]></textFieldExpression>
+				<reportElement x="30" y="0" width="50" height="20" uuid="f436ba60-cbbb-4164-b8c0-6d9e5da9f7d7"/>
+				<textFieldExpression><![CDATA[$F{CodArt}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>

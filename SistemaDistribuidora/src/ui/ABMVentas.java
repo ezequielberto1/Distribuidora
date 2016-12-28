@@ -26,6 +26,7 @@ import javax.swing.GroupLayout.Alignment;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableModel;
 import javax.swing.LayoutStyle.ComponentPlacement;
 
 import com.toedter.calendar.JDateChooser;
@@ -86,12 +87,14 @@ public class ABMVentas {
 	private final ButtonGroup buttonGroup = new ButtonGroup();
 	private final ButtonGroup buttonGroup_1 = new ButtonGroup();
 	private DataZonas dataZonas;
+	private ArrayList<Articulo_Venta> articulos_venta = new ArrayList<Articulo_Venta>();
+
 	private ArrayList<Articulo_Venta> articulos_agregar = new ArrayList<Articulo_Venta>();
 	private ArrayList<Articulo_Venta> articulos_modificar = new ArrayList<Articulo_Venta>();
 	private ArrayList<Integer> articulos_eliminar = new ArrayList<Integer>();
 	private int seleccionado;
 	private int ventaActual;
-
+	private boolean modificado = false;
 
 
 	/**
@@ -421,11 +424,16 @@ public class ABMVentas {
 	
 	public void editarArticulosVenta(){
 		EditarArticulosVenta eav = new EditarArticulosVenta();
-		eav.setArticulosVenta(tblArticulosVenta);
+		DataVentas dv = new DataVentas();
 		eav.setNroVenta(ventaActual);
-		eav.setAA(articulos_agregar);
+		eav.setArticulosVenta(articulos_venta);
+		eav.setTablaArticulosVenta(tblArticulosVenta);
+		eav.cargarTabla();
+		if(modificado)
+			eav.enableBorrarCambios(true);
+		/*eav.setAA(articulos_agregar);
 		eav.setAM(articulos_modificar);
-		eav.setAE(articulos_eliminar);
+		eav.setAE(articulos_eliminar);*/
 		eav.setCaller(this);
 		eav.show(true);
 	}
@@ -441,12 +449,18 @@ public class ABMVentas {
         dateFechaVenta.setDate(v.getFecha());
         cmbZona.setSelectedItem(v.getZona());
         dv.cargarDetalleVenta(tblArticulosVenta, v.getNro());
-        articulos_agregar = new ArrayList<Articulo_Venta>();
+        articulos_venta = dv.getArticulosVenta(nro_venta);
+        /*articulos_agregar = new ArrayList<Articulo_Venta>();
     	articulos_modificar = new ArrayList<Articulo_Venta>();
-    	articulos_eliminar = new ArrayList<Integer>();
+    	articulos_eliminar = new ArrayList<Integer>();*/
 	}
 	
-	public void setArticulosEliminar(ArrayList<Integer> ae){
+	
+	public void setArticulosVenta(ArrayList<Articulo_Venta> av){
+		articulos_venta=av;
+	}
+	
+	/*public void setArticulosEliminar(ArrayList<Integer> ae){
 		articulos_eliminar=ae;
 	}
 	
@@ -456,7 +470,7 @@ public class ABMVentas {
 	
 	public void setArticulosAgregar(ArrayList<Articulo_Venta> aa){
 		articulos_agregar=aa;
-	}
+	}*/
 	
 	public void seleccionarVenta() {
 		if ((articulos_agregar.size()==0) && (articulos_modificar.size()==0) && (articulos_eliminar.size()==0)){
@@ -505,8 +519,19 @@ public class ABMVentas {
 		return b;			
 	}
 	
-	public void setArticulosVenta(JTable tabla){
-		tblArticulosVenta = tabla;
+	public void setTablaArticulosVenta(JTable tabla){
+		TableModel tm = tabla.getModel();
+		tblArticulosVenta.setModel(tm);
+		TableColumnModel m = tblArticulosVenta.getColumnModel();
+		m.getColumn(2).setCellRenderer(NumberRenderer.getCurrencyRenderer());
+		m.getColumn(3).setCellRenderer(NumberRenderer.getCurrencyRenderer());
+		m.getColumn(5).setCellRenderer(NumberRenderer.getCurrencyRenderer());
+		m.getColumn(6).setCellRenderer(NumberRenderer.getCurrencyRenderer());
+		m.getColumn(7).setCellRenderer(NumberRenderer.getCurrencyRenderer());
+	}
+	
+	public void setModificado(boolean b){
+		modificado = b;
 	}
 }
 	

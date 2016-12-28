@@ -15,6 +15,8 @@ import java.awt.Font;
 
 import javax.swing.SwingConstants;
 
+import data.FactoryConexion;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
@@ -22,6 +24,8 @@ import java.awt.event.ActionEvent;
 public class MenuReportes {
 
 	private JFrame frame;
+	private GenerarReporteVentasDia grvd;
+	private GenerarReportePedidosDia grpd;
 
 	/**
 	 * Launch the application.
@@ -64,7 +68,7 @@ public class MenuReportes {
 		JButton btnGestionDeVentas = new JButton("Ventas por d\u00EDa");
 		btnGestionDeVentas.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				GenerarReporteVentasDia.main(null);
+				generarRVD();
 			}
 		});
 		btnGestionDeVentas.setBounds(0, 66, 168, 33);
@@ -72,7 +76,7 @@ public class MenuReportes {
 		JButton btnPedidosDelDia = new JButton("Pedidos por d\u00EDa");
 		btnPedidosDelDia.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				GenerarReportePedidosDia.main(null);
+				generarRPD();
 			}
 		});
 		btnPedidosDelDia.setBounds(0, 34, 168, 33);
@@ -85,5 +89,19 @@ public class MenuReportes {
 		lblMenPrincipal.setFont(new Font("Tahoma", Font.BOLD, 12));
 		lblMenPrincipal.setBounds(0, 0, 168, 33);
 		frame.getContentPane().add(lblMenPrincipal);
+	}
+	
+	public void generarRPD(){
+		if (grpd==null){
+			grpd = new GenerarReportePedidosDia();
+		}
+		grpd.show(true);
+	}
+	
+	public void generarRVD(){
+		if (grvd==null){
+			grvd = new GenerarReporteVentasDia();
+		}
+		grvd.show(true);
 	}
 }

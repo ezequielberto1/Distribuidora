@@ -182,4 +182,7 @@ public class GenerarReportePedidosDia {
 		return;
 	}
 	
+	public void show(boolean b){
+		this.frmGenerarReporte.setVisible(b);
+	}
 }

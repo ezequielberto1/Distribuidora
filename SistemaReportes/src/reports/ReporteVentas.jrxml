@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.3.0.final using JasperReports Library version 6.3.0  -->
-<!-- 2016-11-03T18:29:52 -->
+<!-- 2016-12-11T18:17:38 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReporteVentas" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="1c7c6cdf-3793-4808-9e6c-e61f9c998be7">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Base MSAccess"/>
@@ -16,28 +16,28 @@
 		<![CDATA[SELECT articulos.rubro AS Marca,
 	ventasfinal.codart AS CodArt,
 	ventasfinal.descripcion AS Descripcion,
-	sum( ventasfinal.cantidad) AS Cantidad,
-	articulos.costo AS CostoU,
-	articulos.lista1 AS PrecioU,
-	sum( ventasfinal.subtotalcosto) AS SubtotalCosto,
-	sum( ventasfinal.cantidad * articulos.lista1) AS SubtotalVenta,
-	sum( ventasfinal.ganancia) AS SubtotalGanancia
+	sum(ventasfinal.subtotal/ventasfinal.monto) AS Cantidad,
+	ventasfinal.costo AS CostoU,
+	ventasfinal.monto AS PrecioU,
+	sum(ventasfinal.costo*ventasfinal.subtotal/ventasfinal.monto) AS SubtotalCosto,
+	sum(ventasfinal.subtotal) AS SubtotalVenta,
+	sum(ventasfinal.subtotal-ventasfinal.costo*ventasfinal.subtotal/ventasfinal.monto) AS SubtotalGanancia
 FROM ventasfinal
-	inner join articulos ON 
-	 ventasfinal.codart = articulos.codigo 
+	INNER JOIN articulos
+	ON articulos.codigo = ventasfinal.codart
 WHERE ventasfinal.fecha = $P{fecha} and $X{IN,ventasfinal.iva,zonas}
-group by articulos.rubro, ventasfinal.codart, ventasfinal.descripcion, articulos.costo, articulos.lista1
+group by articulos.rubro, ventasfinal.codart, ventasfinal.descripcion, ventasfinal.costo, ventasfinal.monto
 order by articulos.rubro asc, ventasfinal.codart asc]]>
 	</queryString>
 	<field name="Marca" class="java.lang.String"/>
 	<field name="CodArt" class="java.lang.Integer"/>
 	<field name="Descripcion" class="java.lang.String"/>
-	<field name="Cantidad" class="java.lang.Long"/>
+	<field name="Cantidad" class="java.lang.Double"/>
 	<field name="CostoU" class="java.math.BigDecimal"/>
 	<field name="PrecioU" class="java.math.BigDecimal"/>
-	<field name="SubtotalCosto" class="java.math.BigDecimal"/>
+	<field name="SubtotalCosto" class="java.lang.Double"/>
 	<field name="SubtotalVenta" class="java.math.BigDecimal"/>
-	<field name="SubtotalGanancia" class="java.math.BigDecimal"/>
+	<field name="SubtotalGanancia" class="java.lang.Double"/>
 	<variable name="CostoMarca" class="java.math.BigDecimal" resetType="Group" resetGroup="marcaGRP" calculation="Sum">
 		<variableExpression><![CDATA[$F{SubtotalCosto}]]></variableExpression>
 		<initialValueExpression><![CDATA[BigDecimal.valueOf(0)]]></initialValueExpression>
@@ -230,14 +230,6 @@ order by articulos.rubro asc, ventasfinal.codart asc]]>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{Descripcion}]]></textFieldExpression>
 			</textField>
-			<textField>
-				<reportElement x="250" y="0" width="50" height="20" uuid="5f8cad83-b368-45d6-8c02-509ead47b8ad"/>
-				<box padding="0"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="8"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{Cantidad}]]></textFieldExpression>
-			</textField>
 			<textField pattern="¤#,##0.00;¤-#,##0.00">
 				<reportElement x="300" y="0" width="50" height="20" uuid="df3f5675-e917-4d26-858a-f2238734c1a4"/>
 				<box padding="0"/>
@@ -255,14 +247,6 @@ order by articulos.rubro asc, ventasfinal.codart asc]]>
 				<textFieldExpression><![CDATA[$F{PrecioU}]]></textFieldExpression>
 			</textField>
 			<textField pattern="¤#,##0.00;¤-#,##0.00">
-				<reportElement x="400" y="0" width="50" height="20" uuid="a106c45d-4b6f-4893-8955-f5230a9dea17"/>
-				<box padding="0"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="8"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{SubtotalCosto}]]></textFieldExpression>
-			</textField>
-			<textField pattern="¤#,##0.00;¤-#,##0.00">
 				<reportElement x="450" y="0" width="50" height="20" uuid="b5c9af48-db93-48ac-9e50-2b5d432b738f"/>
 				<box padding="0"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
@@ -270,12 +254,22 @@ order by articulos.rubro asc, ventasfinal.codart asc]]>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{SubtotalVenta}]]></textFieldExpression>
 			</textField>
+			<textField pattern="###0.000;¤-#,###0.000">
+				<reportElement x="250" y="0" width="50" height="20" uuid="59dd2ae9-92fb-4b8c-8a54-e1d5dd8fd711"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Cantidad}]]></textFieldExpression>
+			</textField>
 			<textField pattern="¤#,##0.00;¤-#,##0.00">
-				<reportElement x="500" y="0" width="50" height="20" uuid="1ab65848-9362-42cf-a06e-069d96d04bb4">
-					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
-				</reportElement>
-				<box padding="0"/>
+				<reportElement x="400" y="0" width="50" height="20" uuid="a4d850f0-0036-4c01-b1ad-343bee95fc8c"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SubtotalCosto}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤#,##0.00;¤-#,##0.00">
+				<reportElement x="500" y="0" width="50" height="20" uuid="0a544658-49be-4436-b00b-794d26f8ba99"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>

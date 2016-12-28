@@ -11,7 +11,8 @@ private Connection conn;
 	
 	private String dbType="ucanaccess";
 	private String dbDriver="net.ucanaccess.jdbc.UcanaccessDriver";
-	private String host="C:/Proyectos/gerardo/base.mdb";
+	//private String host="C:/Proyectos/gerardo/base.mdb";
+	private String host="C:/Users/Ezequiel/Desktop/Nueva carpeta/base.mdb";
 	private String user="";
 	private String pass="";
 	private String db="";

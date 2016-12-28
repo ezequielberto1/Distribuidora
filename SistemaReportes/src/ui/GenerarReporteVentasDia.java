@@ -30,6 +30,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
 import javax.swing.JTextField;
+
 import java.awt.SystemColor;
 
 public class GenerarReporteVentasDia {
@@ -39,6 +40,7 @@ public class GenerarReporteVentasDia {
 	private DataZonas DataZonas;
 	private JTextField txtVendedor;
 	private JTextField txtComision;
+	private MenuReportes menur;
 
 
 	/**
@@ -223,6 +225,18 @@ public class GenerarReporteVentasDia {
 			tabla.getModel().setValueAt(Boolean.FALSE, i, 1);
 		}	
 		return;
+	}
+	
+	public void show(boolean b){
+		this.frmGenerarReporte.setVisible(b);
+	}
+
+	public void setCaller(MenuReportes menu){
+		menur = menu;
+	}
+
+	public MenuReportes getCaller(){
+		return menur;
 	}
 	
 }

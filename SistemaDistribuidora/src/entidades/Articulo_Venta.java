@@ -6,7 +6,7 @@ import java.util.Vector;
 public class Articulo_Venta {
 	private int codigo;
 	private String nombre;
-	private int cantidad;
+	private float cantidad;
 	private float costo;
 	private float precio;
 	private float subtotalcosto;
@@ -20,7 +20,7 @@ public class Articulo_Venta {
 		this.setNombre((String)v.get(1));
 		this.setCosto(Float.parseFloat(v.get(2).toString()));
 		this.setPrecio(Float.parseFloat(v.get(3).toString()));
-		this.setCantidad(Integer.parseInt(v.get(4).toString()));
+		this.setCantidad(Float.parseFloat(v.get(4).toString()));
 		this.setSubtotalcosto(Float.parseFloat(v.get(5).toString()));
 		this.setSubtotalventa(Float.parseFloat(v.get(6).toString()));
 	}
@@ -37,10 +37,10 @@ public class Articulo_Venta {
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
 	}
-	public int getCantidad() {
+	public float getCantidad() {
 		return cantidad;
 	}
-	public void setCantidad(int cantidad) {
+	public void setCantidad(float cantidad) {
 		this.cantidad = cantidad;
 	}
 	public float getCosto() {
