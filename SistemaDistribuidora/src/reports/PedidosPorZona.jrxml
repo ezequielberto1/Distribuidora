@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.3.0.final using JasperReports Library version 6.3.0  -->
+<!-- 2016-12-11T18:35:39 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PedidosPorZona" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="b530b82f-1c39-4b70-8984-e706ab646d1b">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Base MSAccess"/>
+	<parameter name="fecha" class="java.util.Date"/>
+	<parameter name="zonasString" class="java.lang.String"/>
+	<parameter name="zonas" class="java.util.Collection" nestedType="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT ventasfinal.codart AS CodArt,
+	ventasfinal.descripcion AS Descripcion,
+	sum(ventasfinal.subtotal/ventasfinal.monto) AS Cantidad
+FROM ventasfinal
+WHERE ventasfinal.fecha = $P{fecha} and $X{IN,ventasfinal.iva,zonas}
+group by ventasfinal.codart, ventasfinal.descripcion
+order by ventasfinal.codart asc]]>
+	</queryString>
+	<field name="CodArt" class="java.lang.Integer"/>
+	<field name="Descripcion" class="java.lang.String"/>
+	<field name="Cantidad" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="90" splitType="Stretch">
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="-20" y="30" width="595" height="30" uuid="61045ff5-2568-4603-aa2e-e0b6acd59846">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="20" isBold="true" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{fecha}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="-20" y="0" width="595" height="30" uuid="9a6c037b-dca8-40dd-a1c6-28aeea0aa943">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="20" isBold="true" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["PEDIDOS POR ZONA"]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="">
+				<reportElement x="-20" y="60" width="595" height="30" uuid="ac55eda5-5920-4861-ab5a-60b245c77f85">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="13" isBold="true" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Zonas: " + $P{zonasString}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="30">
+			<staticText>
+				<reportElement x="30" y="0" width="50" height="30" uuid="1f9fa908-c36e-4f54-878a-9370fe9e756b">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Cod. Art.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="100" y="0" width="360" height="30" uuid="7562801f-3d0d-443f-a470-91c5873caf07"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Descripcion]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="480" y="0" width="50" height="30" uuid="19636ba6-8ac1-4017-b939-93828f7458bf"/>
+				<box padding="0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Cantidad]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement x="100" y="0" width="360" height="20" uuid="854ee4ad-bb81-4cf6-a3a5-d85ee31fb475"/>
+				<textFieldExpression><![CDATA[$F{Descripcion}]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.000;¤-#,###0.000">
+				<reportElement x="480" y="0" width="50" height="20" uuid="29ecfe68-4c03-4d69-b8c6-15c26280b6b3"/>
+				<textFieldExpression><![CDATA[$F{Cantidad}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="30" y="0" width="50" height="20" uuid="f436ba60-cbbb-4164-b8c0-6d9e5da9f7d7"/>
+				<textFieldExpression><![CDATA[$F{CodArt}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

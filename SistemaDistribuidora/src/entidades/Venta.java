@@ -3,7 +3,10 @@ package entidades;
 public class Venta {
 	private int nro;
 	private java.util.Date fecha;
+	private int codcli;
 	private String cliente;
+	private String domicilio;
+	private String localidad;
 	private String zona;
 	
 	public int getNro() {
@@ -33,6 +36,24 @@ public class Venta {
 	
 	public Venta(){
 		
+	}
+	public int getCodcli() {
+		return codcli;
+	}
+	public void setCodcli(int codcli) {
+		this.codcli = codcli;
+	}
+	public String getDomicilio() {
+		return domicilio;
+	}
+	public void setDomicilio(String domicilio) {
+		this.domicilio = domicilio;
+	}
+	public String getLocalidad() {
+		return localidad;
+	}
+	public void setLocalidad(String localidad) {
+		this.localidad = localidad;
 	}
 
 }

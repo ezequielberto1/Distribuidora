@@ -88,7 +88,7 @@ public class BuscarArticulo {
 		JButton btnCancelar = new JButton("Volver");
 		btnCancelar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				show(false);
+				volver();
 			}
 		});
 		btnCancelar.setBounds(608, 302, 119, 23);
@@ -152,6 +152,12 @@ public class BuscarArticulo {
 	public void agregarArticulo(){
 		Articulo_Venta art = getSeleccionado();
 		eav.mapearAFormulario(art);
+		eav.setNullBuscarArticulo();
 		this.show(false);
+	}
+	
+	public void volver(){
+		eav.setNullBuscarArticulo();
+		show(false);
 	}
 }

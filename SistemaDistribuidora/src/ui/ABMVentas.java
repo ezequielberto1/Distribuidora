@@ -39,7 +39,6 @@ import entidades.Venta;
 
 import javax.swing.UIManager;
 
-import reports.ReporteVentasGen;
 import utils.FormatRenderer;
 import utils.NumberRenderer;
 
@@ -72,10 +71,9 @@ public class ABMVentas {
 	private JButton btnAplicarFecha;
 	private JScrollPane scrListaClientes;
 	private JPanel panel;
-	private JButton button_1;
 	private JButton button_5;
 	private JButton button_6;
-	private JButton button;
+	private JButton btnFiltrar;
 	private JButton btnGuardarCambios;
 	private JLabel lblCodigo;
 	private JLabel lblFecha;
@@ -89,12 +87,17 @@ public class ABMVentas {
 	private DataZonas dataZonas;
 	private ArrayList<Articulo_Venta> articulos_venta = new ArrayList<Articulo_Venta>();
 
-	private ArrayList<Articulo_Venta> articulos_agregar = new ArrayList<Articulo_Venta>();
-	private ArrayList<Articulo_Venta> articulos_modificar = new ArrayList<Articulo_Venta>();
-	private ArrayList<Integer> articulos_eliminar = new ArrayList<Integer>();
 	private int seleccionado;
 	private int ventaActual;
 	private boolean modificado = false;
+	private String orden = "ventasfinal.[numventa] DESC";
+	private String filtro = "";
+	private boolean changeSelected = false;
+	
+	private EditarArticulosVenta eav;
+	private FiltrarListaVentas flv;
+	private OrdenarLista ord;
+	private MenuPrincipal mp;
 
 
 	/**
@@ -124,16 +127,8 @@ public class ABMVentas {
 	    catch(Exception e){ 
 	    }
 		initialize();
-		dataVentas = new DataVentas();
-		dataZonas = new DataZonas();
-		Vector<Object> zonas = dataZonas.getZonas();
-		
-		for (int i = 0; i < zonas.size(); i++) {
-			cmbZona.addItem(zonas.get(i).toString());
-		}
-		Date fd = new java.util.Date();
-		Date fh = new java.util.Date();
-		dataVentas.cargarListaVentasDefault(tblListaVentas, fd, fh);
+		cargarZonas();
+		cargarListaVentas();
 		
 	}
 
@@ -175,8 +170,6 @@ public class ABMVentas {
 		
 		scrListaClientes = new JScrollPane();
 		
-		button_1 = new JButton("Buscar");
-		
 		btnGuardarCambios = new JButton("Guardar cambios");
 		btnGuardarCambios.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -202,15 +195,7 @@ public class ABMVentas {
 		btnAplicarFecha = new JButton("Aplicar");
 		btnAplicarFecha.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				Date fd = dateFechaDesde.getDate();
-				Date fh = dateFechaHasta.getDate();
-				DataVentas dv = new DataVentas();
-				
-				if (marcas.size()==0 && zonas.size()==0)
-					dv.cargarListaVentasDefault(tblListaVentas, fd, fh);
-				else
-					dv.cargarListaVentas(tblListaVentas, fd, fh, marcas, zonas);
-				
+				cargarListaVentas();
 			}
 		});
 		
@@ -232,34 +217,36 @@ public class ABMVentas {
 		tblArticulosVenta.setFont(new Font("Tahoma", Font.PLAIN, 9));
 		scrollPane.setViewportView(tblArticulosVenta);
 		
-		button = new JButton("Filtrar...");
-		buttonGroup.add(button);
-		button.addActionListener(new ActionListener() {
+		btnFiltrar = new JButton("Filtrar...");
+		buttonGroup.add(btnFiltrar);
+		btnFiltrar.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent arg0) {
-				DataVentas dv = new DataVentas();
-				FiltrarListaVentas flv = new FiltrarListaVentas();
-				flv.setMarcas(marcas);
-				flv.setVendedores(zonas);
-				flv.runFiltro();
-				//marcas = frmFiltrar.getMarcas();
-				//vendedores = frmFiltrar.getVendedores();
-				
-				dv.cargarListaVentas(tblListaVentas, fd, fh, marcas, zonas);
+				filtrarListaVentas();
 			}
 		});
 		
 		button_6 = new JButton("Ordenar...");
+		button_6.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				ordenar();
+			}
+		});
 		buttonGroup.add(button_6);
 		
-		JButton btnReporte = new JButton("Reporte...");
-		btnReporte.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				GenerarReporteVentas.main(null);
+		JButton button_2 = new JButton("Eliminar");
+		button_2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				eliminarVenta();
 			}
 		});
 		
-		JButton button_2 = new JButton("Eliminar");
+		JButton btnVolver = new JButton("Volver");
+		btnVolver.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				volver();
+			}
+		});
 		GroupLayout groupLayout = new GroupLayout(frmGestionVentas.getContentPane());
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
@@ -268,25 +255,23 @@ public class ABMVentas {
 					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
 						.addGroup(groupLayout.createSequentialGroup()
 							.addComponent(scrListaClientes, GroupLayout.DEFAULT_SIZE, 332, Short.MAX_VALUE)
-							.addGap(6)
-							.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING, false)
-								.addComponent(panel, GroupLayout.PREFERRED_SIZE, 378, GroupLayout.PREFERRED_SIZE)
-								.addGroup(Alignment.LEADING, groupLayout.createSequentialGroup()
-									.addPreferredGap(ComponentPlacement.RELATED)
-									.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-										.addGroup(groupLayout.createSequentialGroup()
-											.addComponent(btnGuardarCambios, GroupLayout.PREFERRED_SIZE, 177, GroupLayout.PREFERRED_SIZE)
-											.addPreferredGap(ComponentPlacement.RELATED, 25, Short.MAX_VALUE)
-											.addComponent(button_2, GroupLayout.PREFERRED_SIZE, 176, GroupLayout.PREFERRED_SIZE))
-										.addGroup(groupLayout.createSequentialGroup()
-											.addComponent(button_1, GroupLayout.PREFERRED_SIZE, 176, GroupLayout.PREFERRED_SIZE)
-											.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-											.addComponent(button_5, GroupLayout.PREFERRED_SIZE, 177, GroupLayout.PREFERRED_SIZE)))
-									.addPreferredGap(ComponentPlacement.RELATED))))
+							.addGap(6))
 						.addGroup(groupLayout.createSequentialGroup()
 							.addComponent(button_6)
 							.addGap(10)
-							.addComponent(button, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)))
+							.addComponent(btnFiltrar, GroupLayout.PREFERRED_SIZE, 85, GroupLayout.PREFERRED_SIZE)
+							.addGap(158)))
+					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
+						.addComponent(panel, GroupLayout.PREFERRED_SIZE, 378, GroupLayout.PREFERRED_SIZE)
+						.addGroup(groupLayout.createSequentialGroup()
+							.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING, false)
+								.addComponent(button_2, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+								.addComponent(btnGuardarCambios, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 177, Short.MAX_VALUE))
+							.addPreferredGap(ComponentPlacement.RELATED, 24, Short.MAX_VALUE)
+							.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
+								.addComponent(button_5, GroupLayout.PREFERRED_SIZE, 177, GroupLayout.PREFERRED_SIZE)
+								.addComponent(btnVolver, GroupLayout.PREFERRED_SIZE, 177, GroupLayout.PREFERRED_SIZE))
+							.addPreferredGap(ComponentPlacement.RELATED)))
 					.addGap(10))
 				.addGroup(groupLayout.createSequentialGroup()
 					.addContainerGap()
@@ -299,22 +284,18 @@ public class ABMVentas {
 					.addComponent(dateFechaHasta, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 					.addGap(18)
 					.addComponent(btnAplicarFecha)
-					.addPreferredGap(ComponentPlacement.RELATED, 293, Short.MAX_VALUE)
-					.addComponent(btnReporte)
-					.addContainerGap())
+					.addContainerGap(386, Short.MAX_VALUE))
 		);
 		groupLayout.setVerticalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
 				.addGroup(groupLayout.createSequentialGroup()
 					.addContainerGap()
-					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
-						.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-							.addComponent(label, GroupLayout.PREFERRED_SIZE, 23, GroupLayout.PREFERRED_SIZE)
-							.addComponent(dateFechaDesde, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-							.addComponent(label_1, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE)
-							.addComponent(dateFechaHasta, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-							.addComponent(btnAplicarFecha, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE))
-						.addComponent(btnReporte))
+					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+						.addComponent(label, GroupLayout.PREFERRED_SIZE, 23, GroupLayout.PREFERRED_SIZE)
+						.addComponent(dateFechaDesde, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(label_1, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE)
+						.addComponent(dateFechaHasta, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(btnAplicarFecha, GroupLayout.PREFERRED_SIZE, 20, GroupLayout.PREFERRED_SIZE))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
 						.addComponent(scrListaClientes, GroupLayout.DEFAULT_SIZE, 471, Short.MAX_VALUE)
@@ -324,14 +305,14 @@ public class ABMVentas {
 							.addPreferredGap(ComponentPlacement.UNRELATED)
 							.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
 								.addComponent(button_5)
-								.addComponent(button_1))))
+								.addComponent(btnGuardarCambios))))
 					.addGap(11)
 					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
 						.addComponent(button_6)
 						.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-							.addComponent(button)
-							.addComponent(btnGuardarCambios)
-							.addComponent(button_2)))
+							.addComponent(btnFiltrar)
+							.addComponent(button_2)
+							.addComponent(btnVolver)))
 					.addContainerGap())
 		);
 		
@@ -423,7 +404,8 @@ public class ABMVentas {
 	}
 	
 	public void editarArticulosVenta(){
-		EditarArticulosVenta eav = new EditarArticulosVenta();
+		if (eav==null)
+			eav = new EditarArticulosVenta();
 		DataVentas dv = new DataVentas();
 		eav.setNroVenta(ventaActual);
 		eav.setArticulosVenta(articulos_venta);
@@ -431,9 +413,6 @@ public class ABMVentas {
 		eav.cargarTabla();
 		if(modificado)
 			eav.enableBorrarCambios(true);
-		/*eav.setAA(articulos_agregar);
-		eav.setAM(articulos_modificar);
-		eav.setAE(articulos_eliminar);*/
 		eav.setCaller(this);
 		eav.show(true);
 	}
@@ -441,64 +420,64 @@ public class ABMVentas {
 	public void cargarDetalleVenta(){
 		DataVentas dv = new DataVentas();
     	int nro_venta;
-        nro_venta = (Integer)(tblListaVentas.getValueAt(tblListaVentas.getSelectedRow(), 1));
-        ventaActual = nro_venta;
-        Venta v = dv.getVenta(nro_venta);
-        txtNroVenta.setText(Integer.toString(v.getNro()));
-        txtCliente.setText(v.getCliente());
-        dateFechaVenta.setDate(v.getFecha());
-        cmbZona.setSelectedItem(v.getZona());
-        dv.cargarDetalleVenta(tblArticulosVenta, v.getNro());
-        articulos_venta = dv.getArticulosVenta(nro_venta);
-        /*articulos_agregar = new ArrayList<Articulo_Venta>();
-    	articulos_modificar = new ArrayList<Articulo_Venta>();
-    	articulos_eliminar = new ArrayList<Integer>();*/
+    	if(tblListaVentas.getSelectedRow()>=0){
+	        nro_venta = (Integer)(tblListaVentas.getValueAt(tblListaVentas.getSelectedRow(), 1));
+	        ventaActual = nro_venta;
+	        Venta v = dv.getVenta(nro_venta);
+	        txtNroVenta.setText(Integer.toString(v.getNro()));
+	        txtCliente.setText(v.getCliente());
+	        dateFechaVenta.setDate(v.getFecha());
+	        cmbZona.setSelectedItem(v.getZona());
+	        dv.cargarDetalleVenta(tblArticulosVenta, v.getNro());
+			copiarArrayList(articulos_venta, dv.getArticulosVenta(nro_venta));
+    	}
 	}
 	
 	
 	public void setArticulosVenta(ArrayList<Articulo_Venta> av){
-		articulos_venta=av;
+		copiarArrayList(articulos_venta, av);
 	}
-	
-	/*public void setArticulosEliminar(ArrayList<Integer> ae){
-		articulos_eliminar=ae;
-	}
-	
-	public void setArticulosModificar(ArrayList<Articulo_Venta> am){
-		articulos_modificar=am;
-	}
-	
-	public void setArticulosAgregar(ArrayList<Articulo_Venta> aa){
-		articulos_agregar=aa;
-	}*/
 	
 	public void seleccionarVenta() {
-		if ((articulos_agregar.size()==0) && (articulos_modificar.size()==0) && (articulos_eliminar.size()==0)){
-			cargarDetalleVenta();
-			seleccionado = tblListaVentas.getSelectedRow();
-		}
-		else {
-			if(JOptionPane.showConfirmDialog(frmGestionVentas, "Si selecciona otra venta perderá los cambios hechos. ¿Seleccionar de todos modos?")==JOptionPane.YES_OPTION){
+		if(changeSelected=true)
+			if (modificado==false){
 				cargarDetalleVenta();
 				seleccionado = tblListaVentas.getSelectedRow();
 			}
 			else {
-				tblListaVentas.setRowSelectionInterval(seleccionado, seleccionado);
+				if(JOptionPane.showConfirmDialog(frmGestionVentas, "Si selecciona otra venta perderá los cambios hechos. ¿Seleccionar de todos modos?")==JOptionPane.YES_OPTION){
+					cargarDetalleVenta();
+					seleccionado = tblListaVentas.getSelectedRow();
+					modificado=false;
+					eav=null;
+				}
+				else {
+					tblListaVentas.setRowSelectionInterval(seleccionado, seleccionado);
+				}
 			}
-		}
 	}
 	
 	public void modificarVenta() {
-		Venta v = mapearDeFormulario();
-		DataVentas dv = new DataVentas();
-		dv.updateVenta(v, articulos_agregar, articulos_modificar, articulos_eliminar);
+		if(JOptionPane.showConfirmDialog(frmGestionVentas, "¿Desea guardar los cambios realizados?")==JOptionPane.YES_OPTION){
+			Venta v = mapearDeFormulario();
+			DataVentas dv = new DataVentas();
+			dv.updateVenta(v, articulos_venta);
+			modificado=false;
+			eav = null;
+		}
 	}
 	
 	public void eliminarVenta() {
 		DataVentas dv = new DataVentas();
-		Venta v = mapearDeFormulario();
-		if(JOptionPane.showConfirmDialog(frmGestionVentas, "¿Desea eliminar venta Nº " + v.getNro() + "?") == 1)
-			dv.deleteVenta(v);
+		if(tblListaVentas.getSelectedRow()>=0){
+			Venta v = mapearDeFormulario();
+			if(JOptionPane.showConfirmDialog(frmGestionVentas, "¿Desea eliminar venta Nº " + v.getNro() + "?") == JOptionPane.YES_OPTION){
+				dv.deleteVenta(v);
+				cargarListaVentas();
+			}
+		}
+		else
+			JOptionPane.showMessageDialog(frmGestionVentas, "Seleccione una venta.");
 	}
 	
 	public Venta mapearDeFormulario(){
@@ -533,7 +512,69 @@ public class ABMVentas {
 	public void setModificado(boolean b){
 		modificado = b;
 	}
+	
+	public void copiarArrayList(ArrayList<Articulo_Venta> copia, ArrayList<Articulo_Venta> av){
+		copia.clear();
+		for (int i = 0; i < av.size(); i++) {
+			copia.add(new Articulo_Venta(av.get(i)));
+		}
+	}
+	
+	public void ordenar(){
+		if (ord==null)
+			ord = new OrdenarLista();
+		ord.setCaller(this);
+		ord.show(true);
+	}
+	
+	public void cargarZonas(){
+		dataZonas = new DataZonas();
+		Vector<Object> zonas = dataZonas.getZonas();
+		
+		for (int i = 0; i < zonas.size(); i++) {
+			cmbZona.addItem(zonas.get(i).toString());
+		}
+	}
+	
+	public void cargarListaVentas(){
+		dataVentas = new DataVentas();
+		
+		Date fd = dateFechaDesde.getDate();
+		Date fh = dateFechaHasta.getDate();
+		if(fd!=null && fh!=null){
+			changeSelected=false;
+			dataVentas.cargarListaVentas(tblListaVentas, fd, fh, orden, filtro);
+			changeSelected=true;
+		}
+		else
+			JOptionPane.showMessageDialog(frmGestionVentas, "Ingrese un rango de fechas válido.");
+	}
+	
+	public void setOrden(String ord){
+		orden = ord;
+	}
+	
+	public void filtrarListaVentas(){
+		if(flv==null)
+			flv = new FiltrarListaVentas();
+		flv.setCaller(this);
+		flv.show(true);
+	}
+	
+	public void setFiltro(String f){
+		filtro = f;
+	}
+	
+	public void show(boolean b){
+		this.frmGestionVentas.setVisible(false);
+	}
+	
+	public void setCaller(MenuPrincipal m){
+		mp = m;
+	}
+	
+	public void volver(){
+		mp.setNullABMV();
+		show(false);
+	}
 }
-	
-	
-

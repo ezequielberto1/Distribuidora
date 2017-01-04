@@ -25,6 +25,16 @@ public class Articulo_Venta {
 		this.setSubtotalventa(Float.parseFloat(v.get(6).toString()));
 	}
 	
+	public Articulo_Venta(Articulo_Venta av){
+		this.setCodigo(av.getCodigo());
+		this.setNombre(av.getNombre());
+		this.setCosto(av.getCosto());
+		this.setPrecio(av.getPrecio());
+		this.setCantidad(av.getCantidad());
+		this.setSubtotalcosto(av.getSubtotalcosto());
+		this.setSubtotalventa(av.getSubtotalventa());
+	}
+	
 	public int getCodigo() {
 		return codigo;
 	}

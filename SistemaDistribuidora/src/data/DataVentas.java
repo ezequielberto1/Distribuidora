@@ -2,11 +2,13 @@ package data;
 //
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Vector;
 
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
+
 
 
 
@@ -18,54 +20,7 @@ import utils.ApplicationException;
 import utils.NumberRenderer;
 
 public class DataVentas {
-	public void cargarListaVentas(JTable tabla, java.util.Date fechaDesde, java.util.Date fechaHasta, ArrayList<String> marcas, ArrayList<String> zonas) {
-		PreparedStatement stmt=null;
-		ResultSet rs=null;
-		DefaultTableModel model;
-		java.sql.Date fd = new java.sql.Date(fechaDesde.getTime());
-		java.sql.Date fh = new java.sql.Date(fechaHasta.getTime());
-		String marcasString = StringUtils.join(marcas.iterator(),"','");
-		marcasString = "'".concat(marcasString.concat("'"));
-		String zonasString = StringUtils.join(zonas.iterator(),"','");
-		zonasString = "'".concat(zonasString.concat("'"));
-		System.out.println(marcasString);
-		System.out.println(zonasString);
-
-		try {
-
-			stmt = FactoryConexion.getInstancia().getConn().prepareStatement("SELECT ventasfinal.[fecha] as Fecha, ventasfinal.[numventa] as Vta, "
-					+ "ventasfinal.[codcli] as CodCli, ventasfinal.[apenom] as Cliente, ventasfinal.[localidad] as Localidad, ventasfinal.[iva] as Zona, "
-					+ "sum(ventasfinal.costo*ventasfinal.subtotal/ventasfinal.monto) as SubtotalCosto, sum(ventasfinal.[subtotal]) as SubtotalVenta, "
-					+ "sum(ventasfinal.subtotal-ventasfinal.costo*ventasfinal.subtotal/ventasfinal.monto) as Ganancia "
-					+ "FROM ventasfinal INNER JOIN articulos ON ventasfinal.[codart]=articulos.[codigo] "
-					+ "WHERE ((ventasfinal.[fecha]) BETWEEN ? AND ?) AND (articulos.[rubro] IN (?)) AND (ventasfinal.[iva] IN (?)) "
-					+ "GROUP BY ventasfinal.[fecha], ventasfinal.[numventa], "
-					+ "ventasfinal.[codcli], ventasfinal.[apenom], ventasfinal.[localidad], ventasfinal.[iva]");
-			stmt.setDate(1, fd);
-			stmt.setDate(2, fh);
-			stmt.setString(3, marcasString);
-			stmt.setString(4, zonasString);
-			rs = stmt.executeQuery();
-			model = buildTableModel(rs);
-			tabla.setModel(model);
-		} catch (SQLException ex) {
-
-			System.out.println("SQLException: " + ex.getMessage());
-			ex.printStackTrace();
-
-
-		}
-		finally{
-			try {
-				if (rs!=null)
-					rs.close();
-				if (stmt!=null)stmt.close();				
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-
-	}
+	
 
 	public void cargarDetalleVenta(JTable tabla, int nro_venta) {
 		PreparedStatement stmt=null;
@@ -82,7 +37,8 @@ public class DataVentas {
 					+ "WHERE ventasfinal.numventa = ?");
 			stmt.setInt(1, nro_venta);
 			rs = stmt.executeQuery();
-			model = buildTableModel(rs);
+			ArrayList<String> columnnames = new ArrayList<String>(Arrays.asList("Codigo","Descripcion","CostoU","PrecioU","Cantidad","Subtotal Costo","Subtotal Venta","Ganancia"));
+			model = buildTableModel(rs, columnnames);
 			tabla.setModel(model);
 			TableColumnModel m = tabla.getColumnModel();
 			m.getColumn(2).setCellRenderer(NumberRenderer.getCurrencyRenderer());
@@ -208,7 +164,7 @@ public class DataVentas {
 
 	}
 
-	public void cargarListaVentasDefault(JTable tabla, java.util.Date fechaDesde, java.util.Date fechaHasta) {
+	public void cargarListaVentas(JTable tabla, java.util.Date fechaDesde, java.util.Date fechaHasta, String orden, String filtroZonas) {
 		PreparedStatement stmt=null;
 		ResultSet rs=null;
 		DefaultTableModel model;
@@ -216,20 +172,22 @@ public class DataVentas {
 		java.sql.Date fh = new java.sql.Date(fechaHasta.getTime());
 
 		try {
-
 			stmt = FactoryConexion.getInstancia().getConn().prepareStatement("SELECT ventasfinal.[fecha] as Fecha, ventasfinal.[numventa] as Vta, "
 					+ "ventasfinal.[codcli] as CodCli, ventasfinal.[apenom] as Cliente, ventasfinal.[localidad] as Localidad, ventasfinal.[iva] as Zona, "
 					+ "sum(ventasfinal.[costo]*ventasfinal.[subtotal]/ventasfinal.[monto]) as SubtotalCosto, sum(ventasfinal.[subtotal]) as SubtotalVenta, "
 					+ "sum(ventasfinal.[subtotal]-ventasfinal.[costo]*ventasfinal.[subtotal]/ventasfinal.[monto]) as Ganancia "
 					+ "FROM ventasfinal "
-					+ "WHERE ventasfinal.[fecha] BETWEEN ? AND ? "
+					+ "WHERE ((ventasfinal.[fecha] BETWEEN ? AND ?) " + filtroZonas +") "
 					+ "GROUP BY ventasfinal.[fecha], ventasfinal.[numventa], "
-					+ "ventasfinal.[codcli], ventasfinal.[apenom], ventasfinal.[localidad], ventasfinal.[iva]");
+					+ "ventasfinal.[codcli], ventasfinal.[apenom], ventasfinal.[localidad], ventasfinal.[iva] "
+					+ "ORDER BY " + orden);
 			stmt.setDate(1, fd);
 			stmt.setDate(2, fh);
-
+	
 			rs = stmt.executeQuery();
-			model = buildTableModel(rs);
+			
+			ArrayList<String> columnnames = new ArrayList<String>(Arrays.asList("Fecha","Nº Vta.","Nº Cli.","Cliente","Localidad","Zona","Subtotal Costo", "Subtotal Venta", "Ganancia"));
+			model = buildTableModel(rs, columnnames);
 			tabla.setModel(model);
 			TableColumnModel m = tabla.getColumnModel();
 			m.getColumn(6).setCellRenderer(NumberRenderer.getCurrencyRenderer());
@@ -262,7 +220,7 @@ public class DataVentas {
 		try {
 
 			stmt = FactoryConexion.getInstancia().getConn().prepareStatement("SELECT ventasfinal.[fecha], ventasfinal.[numventa], "
-					+ "ventasfinal.[apenom], ventasfinal.[iva] "
+					+ "ventasfinal.[codcli], ventasfinal.[apenom], ventasfinal.[domicilio], ventasfinal.[localidad], ventasfinal.[iva] "
 					+ "FROM ventasfinal "
 					+ "WHERE ventasfinal.numventa = ?");
 			stmt.setInt(1, nro_venta);
@@ -270,8 +228,11 @@ public class DataVentas {
 			while(rs.next()){
 				v.setFecha(rs.getDate(1));
 				v.setNro(rs.getInt(2));
-				v.setCliente(rs.getString(3));
-				v.setZona(rs.getString(4));
+				v.setCodcli(rs.getInt(3));
+				v.setCliente(rs.getString(4));
+				v.setDomicilio(rs.getString(5));
+				v.setLocalidad(rs.getString(6));
+				v.setZona(rs.getString(7));
 			}
 		} catch (SQLException ex) {
 
@@ -342,78 +303,42 @@ public class DataVentas {
 		return v;
 
 	}
-
-	public void updateVenta(Venta v, ArrayList<Articulo_Venta> aa, ArrayList<Articulo_Venta> am, ArrayList<Integer> ae){
+	
+	public void updateVenta(Venta v, ArrayList<Articulo_Venta> av){
 		PreparedStatement stmt=null;
 		ResultSet rs = null;
-		String domicilio = new String(); 
-		String localidad = new String();
 
 		try {
-			stmt= FactoryConexion.getInstancia().getConn().prepareStatement("select distinct domicilio, localidad from ventasfinal "
+			
+			//Eliminar articulos 
+			stmt= FactoryConexion.getInstancia().getConn().prepareStatement("delete * from ventasfinal "
 					+ "where numventa=?");
 			stmt.setInt(1, v.getNro());
-			rs = stmt.executeQuery();
-			while(rs.next()){ //NO ENTRA ACÁ; rs NO DEVUELVE NADA
-				domicilio = rs.getString(1);
-				localidad = rs.getString(2);
-			}
-			//Eliminar articulos 
-			for (int i = 0; i < ae.size(); i++) {
-				stmt= FactoryConexion.getInstancia().getConn().prepareStatement("delete * from ventasfinal "
-						+ "where numventa=? and codart=?");
-				stmt.setInt(1, v.getNro());
-				stmt.setInt(2, ae.get(i));
-				stmt.execute();
-			}
+			stmt.execute();
 			
 			//Agregar articulos
-			for (int i = 0; i < aa.size(); i++) {
+			System.out.println(av.size());
+			for (int i = 0; i < av.size(); i++) {
 				stmt= FactoryConexion.getInstancia().getConn().prepareStatement("insert into ventasfinal "
-						+ "(numventa, fecha, apenom, domicilio, localidad, iva, codart, descripcion, costo "
-						+ "subtotalcosto, ganancia) values(?,?,?,?,?,?,?,?,?,?,?)");
+						+ "(numventa, fecha, codcli, apenom, domicilio, localidad, iva, codart, descripcion, costo, monto, "
+						+ "subtotalcosto, subtotal, ganancia, cantidad) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
 				stmt.setInt(1, v.getNro());
 				stmt.setDate(2, new java.sql.Date(v.getFecha().getTime()));
-				stmt.setString(3, v.getCliente());
-				stmt.setString(4, domicilio);
-				stmt.setString(5, localidad);
-				stmt.setString(6, v.getZona());
-				stmt.setInt(7, aa.get(i).getCodigo());
-				stmt.setString(8, aa.get(i).getNombre());
-				stmt.setFloat(9, aa.get(i).getCosto());
-				stmt.setFloat(10, aa.get(i).getPrecio());
-				stmt.setFloat(11,aa.get(i).getSubtotalcosto());
-				stmt.setFloat(12, (aa.get(i).getSubtotalventa()-aa.get(i).getSubtotalcosto()));
-			}
-			
-			//Modificar articulos
-			for (int i = 0; i < am.size(); i++) {
-				//Primero los elimino
-				stmt= FactoryConexion.getInstancia().getConn().prepareStatement("delete * from ventasfinal "
-						+ "where numventa=? and codart=?");
-				stmt.setInt(1, v.getNro());
-				stmt.setInt(2, ae.get(i));
-				stmt.execute();
-				
-				//Luego los vuelvo a cargar
-				stmt= FactoryConexion.getInstancia().getConn().prepareStatement("insert into ventasfinal "
-						+ "(numventa, fecha, apenom, domicilio, localidad, iva, codart, descripcion, costo "
-						+ "subtotalcosto, ganancia) values(?,?,?,?,?,?,?,?,?,?,?)");
-				stmt.setInt(1, v.getNro());
-				stmt.setDate(2, new java.sql.Date(v.getFecha().getTime()));
-				stmt.setString(3, v.getCliente());
-				stmt.setString(4, domicilio);
-				stmt.setString(5, localidad);
-				stmt.setString(6, v.getZona());
-				stmt.setInt(7, am.get(i).getCodigo());
-				stmt.setString(8, am.get(i).getNombre());
-				stmt.setFloat(9, am.get(i).getCosto());
-				stmt.setFloat(10, am.get(i).getPrecio());
-				stmt.setFloat(11,am.get(i).getSubtotalcosto());
-				stmt.setFloat(12, (am.get(i).getSubtotalventa()-am.get(i).getSubtotalcosto()));
-			}
-			
-			
+				stmt.setInt(3, v.getCodcli());
+				stmt.setString(4, v.getCliente());
+				stmt.setString(5, v.getDomicilio());
+				stmt.setString(6, v.getLocalidad());
+				stmt.setString(7, v.getZona());
+				stmt.setInt(8, av.get(i).getCodigo());
+				stmt.setString(9, av.get(i).getNombre());
+				stmt.setFloat(10, av.get(i).getCosto());
+				stmt.setFloat(11, av.get(i).getPrecio());
+				stmt.setFloat(12,av.get(i).getSubtotalcosto());
+				stmt.setFloat(13,av.get(i).getSubtotalventa());
+				stmt.setFloat(14, (av.get(i).getSubtotalventa()-av.get(i).getSubtotalcosto()));
+				stmt.setFloat(15, av.get(i).getCantidad());
+				stmt.executeUpdate();
+			}	
 
 		} 
 		catch (SQLException e) {
@@ -425,6 +350,7 @@ public class DataVentas {
 			FactoryConexion.getInstancia().releaseConn(); 
 		}
 	}
+	
 	
 	public void deleteVenta(Venta v) {
 		PreparedStatement stmt=null;
@@ -447,16 +373,14 @@ public class DataVentas {
 		
 	}
 
-	public static DefaultTableModel buildTableModel(ResultSet rs)
+	public static DefaultTableModel buildTableModel(ResultSet rs, ArrayList<String> col)
 			throws SQLException {
-
-		ResultSetMetaData metaData = rs.getMetaData();
 
 		// names of columns
 		Vector<String> columnNames = new Vector<String>();
-		int columnCount = metaData.getColumnCount();
-		/**/for (int column = 1; column <= columnCount; column++) {
-			columnNames.add(metaData.getColumnName(column));
+		int columnCount = col.size();
+		for (int column = 0; column < columnCount; column++) {
+			columnNames.add(col.get(column));
 		}
 
 		// data of the table

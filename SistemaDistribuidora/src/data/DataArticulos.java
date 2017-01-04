@@ -4,6 +4,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Vector;
 
 import javax.swing.JTable;
@@ -25,7 +27,8 @@ public class DataArticulos {
 					+ "WHERE rubro = ? ORDER BY codigo");
 			stmt.setString(1, rubro);
 			rs = stmt.executeQuery();
-			model = buildTableModel(rs);
+			ArrayList<String> columnnames = new ArrayList<String>(Arrays.asList("Codigo","Descripcion","CostoU","PrecioU"));
+			model = buildTableModel(rs, columnnames);
 			tabla.setModel(model);
 			TableColumnModel m = tabla.getColumnModel();
 			m.getColumn(2).setCellRenderer(NumberRenderer.getCurrencyRenderer());
@@ -50,16 +53,14 @@ public class DataArticulos {
 
 	}
 	
-	public static DefaultTableModel buildTableModel(ResultSet rs)
+	public static DefaultTableModel buildTableModel(ResultSet rs, ArrayList<String> col)
 			throws SQLException {
-
-		ResultSetMetaData metaData = rs.getMetaData();
 
 		// names of columns
 		Vector<String> columnNames = new Vector<String>();
-		int columnCount = metaData.getColumnCount();
-		/**/for (int column = 1; column <= columnCount; column++) {
-			columnNames.add(metaData.getColumnName(column));
+		int columnCount = col.size();
+		for (int column = 0; column < columnCount; column++) {
+			columnNames.add(col.get(column));
 		}
 
 		// data of the table

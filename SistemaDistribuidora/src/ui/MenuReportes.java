@@ -15,15 +15,19 @@ import java.awt.Font;
 
 import javax.swing.SwingConstants;
 
+import data.FactoryConexion;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
 
-public class MenuPrincipal {
+public class MenuReportes {
 
 	private JFrame frame;
-	private ABMVentas abmv;
-	private MenuReportes mr;
+	private GenerarReporteVentasDia grvd;
+	private GenerarReportePedidosDia grpd;
+	private MenuPrincipal mp;
+
 
 	/**
 	 * Launch the application.
@@ -32,7 +36,7 @@ public class MenuPrincipal {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					MenuPrincipal window = new MenuPrincipal();
+					MenuReportes window = new MenuReportes();
 					window.frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -44,7 +48,7 @@ public class MenuPrincipal {
 	/**
 	 * Create the application.
 	 */
-	public MenuPrincipal() {
+	public MenuReportes() {
 		try 
 	    { 
 	        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); 
@@ -60,55 +64,68 @@ public class MenuPrincipal {
 	private void initialize() {
 		frame = new JFrame();
 		frame.setResizable(false);
-		frame.setBounds(100, 100, 174, 124);
+		frame.setBounds(100, 100, 174, 159);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		JButton btnGestionDeVentas = new JButton("Gesti\u00F3n de ventas");
+		JButton btnGestionDeVentas = new JButton("Ventas por d\u00EDa");
 		btnGestionDeVentas.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				gestionVentas();
+				generarRVD();
 			}
 		});
-		btnGestionDeVentas.setBounds(0, 32, 168, 33);
+		btnGestionDeVentas.setBounds(0, 66, 168, 33);
 		
-		JButton btnReportes = new JButton("Reportes");
-		btnReportes.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				reportes();
+		JButton btnPedidosDelDia = new JButton("Pedidos por d\u00EDa");
+		btnPedidosDelDia.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				generarRPD();
 			}
 		});
-		btnReportes.setBounds(0, 64, 168, 33);
+		btnPedidosDelDia.setBounds(0, 34, 168, 33);
 		frame.getContentPane().setLayout(null);
 		frame.getContentPane().add(btnGestionDeVentas);
-		frame.getContentPane().add(btnReportes);
+		frame.getContentPane().add(btnPedidosDelDia);
 		
-		JLabel lblMenPrincipal = new JLabel("Men\u00FA principal");
+		JLabel lblMenPrincipal = new JLabel("Generar reporte...");
 		lblMenPrincipal.setHorizontalAlignment(SwingConstants.CENTER);
 		lblMenPrincipal.setFont(new Font("Tahoma", Font.BOLD, 12));
 		lblMenPrincipal.setBounds(0, 0, 168, 33);
 		frame.getContentPane().add(lblMenPrincipal);
+		
+		JButton btnVolver = new JButton("Volver");
+		btnVolver.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				volver();
+			}
+		});
+		btnVolver.setBounds(0, 98, 168, 33);
+		frame.getContentPane().add(btnVolver);
 	}
 	
-	public void gestionVentas(){
-		if(abmv==null){
-			abmv = new ABMVentas();
+	public void generarRPD(){
+		if (grpd==null){
+			grpd = new GenerarReportePedidosDia();
 		}
-		abmv.setCaller(this);
-		abmv.show(true);
+		grpd.show(true);
+	}
+	
+	public void generarRVD(){
+		if (grvd==null){
+			grvd = new GenerarReporteVentasDia();
 		}
-	
-	public void reportes(){
-		if(mr==null)
-			mr = new MenuReportes();
-		mr.setCaller(this);
-		mr.show(true);
+		grvd.show(true);
 	}
 	
-	public void setNullABMV(){
-		abmv = null;
+	public void setCaller(MenuPrincipal m){
+		mp = m;
 	}
 	
-	public void setNullMR(){
-		mr = null;
+	public void show (boolean b){
+		this.frame.setVisible(b);
+	}
+	
+	public void volver(){
+		mp.setNullMR();
+		show(false);
 	}
 }

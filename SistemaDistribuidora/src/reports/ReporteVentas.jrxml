@@ -1,169 +1,70 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.3.0.final using JasperReports Library version 6.3.0  -->
-<!-- 2016-09-13T10:56:07 -->
+<!-- 2016-12-11T18:17:38 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReporteVentas" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="1c7c6cdf-3793-4808-9e6c-e61f9c998be7">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Base MSAccess"/>
-	<subDataset name="VentasPorDia" uuid="06fd692d-2faf-4cd7-9c3d-e994210a7eda">
-		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
-		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Base MSAccess"/>
-		<queryString>
-			<![CDATA[SELECT ventasfinal.fecha,
-	vendedores.nombre,
-	articulos.rubro AS Marca,
-	ventasfinal.codart AS CodArt,
-	ventasfinal.descripcion AS Descripcion,
-	sum( ventasfinal.cantidad) AS Cantidad,
-	articulos.costo AS CostoU,
-	articulos.lista1 AS PrecioU,
-	sum( ventasfinal.subtotalcosto) AS SubtotalCosto,
-	sum( ventasfinal.cantidad * articulos.lista1) AS SubtotalVenta,
-	sum( ventasfinal.ganancia) AS SubtotalGanancia
-FROM ventasfinal
-	inner join articulos ON 
-	 ventasfinal.codart = articulos.codigo
-	inner join vendedores ON 
-	 vendedores.cod_vendedor = ventasfinal.cod_vendedor 
-group by ventasfinal.fecha, vendedores.nombre, articulos.rubro, ventasfinal.codart, ventasfinal.descripcion, articulos.costo, articulos.lista1]]>
-		</queryString>
-		<field name="fecha" class="java.sql.Timestamp"/>
-		<field name="nombre" class="java.lang.String"/>
-		<field name="Marca" class="java.lang.String"/>
-		<field name="CodArt" class="java.lang.Integer"/>
-		<field name="Descripcion" class="java.lang.String"/>
-		<field name="Cantidad" class="java.lang.Long"/>
-		<field name="CostoU" class="java.math.BigDecimal"/>
-		<field name="PrecioU" class="java.math.BigDecimal"/>
-		<field name="SubtotalCosto" class="java.math.BigDecimal"/>
-		<field name="SubtotalVenta" class="java.math.BigDecimal"/>
-		<field name="SubtotalGanancia" class="java.math.BigDecimal"/>
-		<group name="vendedorGroup">
-			<groupExpression><![CDATA[$F{nombre}]]></groupExpression>
-		</group>
-		<group name="marca">
-			<groupExpression><![CDATA[$F{Marca}]]></groupExpression>
-		</group>
-	</subDataset>
 	<parameter name="fecha" class="java.util.Date">
 		<parameterDescription><![CDATA[]]></parameterDescription>
 		<defaultValueExpression><![CDATA[TODAY( )]]></defaultValueExpression>
 	</parameter>
-	<parameter name="vendedores" class="java.util.Collection" nestedType="java.lang.Integer"/>
+	<parameter name="porcentaje_comision" class="java.math.BigDecimal"/>
+	<parameter name="zonas" class="java.util.Collection" nestedType="java.lang.String"/>
+	<parameter name="zonasString" class="java.lang.String"/>
+	<parameter name="Vendedor" class="java.lang.String"/>
 	<queryString>
-		<![CDATA[SELECT ventasfinal.fecha,
-	vendedores.nombre,
-	articulos.rubro AS Marca,
+		<![CDATA[SELECT articulos.rubro AS Marca,
 	ventasfinal.codart AS CodArt,
 	ventasfinal.descripcion AS Descripcion,
-	sum( ventasfinal.cantidad) AS Cantidad,
-	articulos.costo AS CostoU,
-	articulos.lista1 AS PrecioU,
-	sum( ventasfinal.subtotalcosto) AS SubtotalCosto,
-	sum( ventasfinal.cantidad * articulos.lista1) AS SubtotalVenta,
-	sum( ventasfinal.ganancia) AS SubtotalGanancia
+	sum(ventasfinal.subtotal/ventasfinal.monto) AS Cantidad,
+	ventasfinal.costo AS CostoU,
+	ventasfinal.monto AS PrecioU,
+	sum(ventasfinal.costo*ventasfinal.subtotal/ventasfinal.monto) AS SubtotalCosto,
+	sum(ventasfinal.subtotal) AS SubtotalVenta,
+	sum(ventasfinal.subtotal-ventasfinal.costo*ventasfinal.subtotal/ventasfinal.monto) AS SubtotalGanancia
 FROM ventasfinal
-	inner join articulos ON 
-	 ventasfinal.codart = articulos.codigo 
-	inner join vendedores ON 
-	 vendedores.cod_vendedor = ventasfinal.cod_vendedor 
-WHERE ventasfinal.fecha = $P{fecha} and  $X{IN, vendedores.cod_vendedor, vendedores} and ventasfinal.ganancia > 0
-group by ventasfinal.fecha, vendedores.nombre, articulos.rubro, ventasfinal.codart, ventasfinal.descripcion, articulos.costo, articulos.lista1]]>
+	INNER JOIN articulos
+	ON articulos.codigo = ventasfinal.codart
+WHERE ventasfinal.fecha = $P{fecha} and $X{IN,ventasfinal.iva,zonas}
+group by articulos.rubro, ventasfinal.codart, ventasfinal.descripcion, ventasfinal.costo, ventasfinal.monto
+order by articulos.rubro asc, ventasfinal.codart asc]]>
 	</queryString>
-	<field name="fecha" class="java.sql.Timestamp"/>
-	<field name="nombre" class="java.lang.String"/>
 	<field name="Marca" class="java.lang.String"/>
 	<field name="CodArt" class="java.lang.Integer"/>
 	<field name="Descripcion" class="java.lang.String"/>
-	<field name="Cantidad" class="java.lang.Long"/>
+	<field name="Cantidad" class="java.lang.Double"/>
 	<field name="CostoU" class="java.math.BigDecimal"/>
 	<field name="PrecioU" class="java.math.BigDecimal"/>
-	<field name="SubtotalCosto" class="java.math.BigDecimal"/>
+	<field name="SubtotalCosto" class="java.lang.Double"/>
 	<field name="SubtotalVenta" class="java.math.BigDecimal"/>
-	<field name="SubtotalGanancia" class="java.math.BigDecimal"/>
+	<field name="SubtotalGanancia" class="java.lang.Double"/>
 	<variable name="CostoMarca" class="java.math.BigDecimal" resetType="Group" resetGroup="marcaGRP" calculation="Sum">
 		<variableExpression><![CDATA[$F{SubtotalCosto}]]></variableExpression>
-		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+		<initialValueExpression><![CDATA[BigDecimal.valueOf(0)]]></initialValueExpression>
 	</variable>
 	<variable name="VentaMarca" class="java.math.BigDecimal" resetType="Group" resetGroup="marcaGRP" calculation="Sum">
 		<variableExpression><![CDATA[$F{SubtotalVenta}]]></variableExpression>
-		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+		<initialValueExpression><![CDATA[BigDecimal.valueOf(0)]]></initialValueExpression>
 	</variable>
 	<variable name="GananciaMarca" class="java.math.BigDecimal" resetType="Group" resetGroup="marcaGRP" calculation="Sum">
 		<variableExpression><![CDATA[$F{SubtotalGanancia}]]></variableExpression>
-		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+		<initialValueExpression><![CDATA[BigDecimal.valueOf(0)]]></initialValueExpression>
 	</variable>
-	<variable name="CostoVendedor" class="java.math.BigDecimal" resetType="Group" resetGroup="vendedorGRP" calculation="Sum">
-		<variableExpression><![CDATA[$F{SubtotalCosto}]]></variableExpression>
-		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	<variable name="TotalCosto" class="java.math.BigDecimal" incrementType="Group" incrementGroup="marcaGRP" calculation="Sum">
+		<variableExpression><![CDATA[$V{CostoMarca}]]></variableExpression>
+		<initialValueExpression><![CDATA[BigDecimal.valueOf(0)]]></initialValueExpression>
 	</variable>
-	<variable name="VentaVendedor" class="java.math.BigDecimal" resetType="Group" resetGroup="vendedorGRP" calculation="Sum">
-		<variableExpression><![CDATA[$F{SubtotalVenta}]]></variableExpression>
-		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	<variable name="TotalVenta" class="java.math.BigDecimal" incrementType="Group" incrementGroup="marcaGRP" calculation="Sum">
+		<variableExpression><![CDATA[$V{VentaMarca}]]></variableExpression>
+		<initialValueExpression><![CDATA[BigDecimal.valueOf(0)]]></initialValueExpression>
 	</variable>
-	<variable name="GananciaVendedor" class="java.math.BigDecimal" resetType="Group" resetGroup="vendedorGRP" calculation="Sum">
-		<variableExpression><![CDATA[$F{SubtotalGanancia}]]></variableExpression>
-		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	<variable name="TotalGanancia" class="java.math.BigDecimal" incrementType="Group" incrementGroup="marcaGRP" calculation="Sum">
+		<variableExpression><![CDATA[$V{GananciaMarca}]]></variableExpression>
+		<initialValueExpression><![CDATA[BigDecimal.valueOf(0)]]></initialValueExpression>
 	</variable>
-	<variable name="TotalCosto" class="java.math.BigDecimal" calculation="Sum">
-		<variableExpression><![CDATA[$F{SubtotalCosto}]]></variableExpression>
-		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	<variable name="Comision" class="java.lang.Number" incrementType="Report">
+		<variableExpression><![CDATA[PRODUCT($P{porcentaje_comision},$V{TotalVenta})]]></variableExpression>
 	</variable>
-	<variable name="TotalVenta" class="java.math.BigDecimal">
-		<variableExpression><![CDATA[$F{SubtotalVenta}]]></variableExpression>
-		<initialValueExpression><![CDATA[0]]></initialValueExpression>
-	</variable>
-	<variable name="TotalGanancia" class="java.math.BigDecimal" calculation="Sum">
-		<variableExpression><![CDATA[$F{SubtotalGanancia}]]></variableExpression>
-		<initialValueExpression><![CDATA[0]]></initialValueExpression>
-	</variable>
-	<group name="vendedorGRP">
-		<groupExpression><![CDATA[$F{nombre}]]></groupExpression>
-		<groupHeader>
-			<band height="30">
-				<textField>
-					<reportElement x="0" y="0" width="550" height="30" uuid="3fd79664-0e31-4dd4-a009-684309d452aa"/>
-					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font size="12" isBold="true"/>
-					</textElement>
-					<textFieldExpression><![CDATA[$F{nombre}]]></textFieldExpression>
-				</textField>
-			</band>
-		</groupHeader>
-		<groupFooter>
-			<band height="30">
-				<textField pattern="¤#,##0.00;¤-#,##0.00">
-					<reportElement x="400" y="0" width="50" height="30" uuid="7898ff36-14ff-4514-a770-a1d63f085524"/>
-					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font size="9"/>
-					</textElement>
-					<textFieldExpression><![CDATA[$V{CostoVendedor}]]></textFieldExpression>
-				</textField>
-				<textField pattern="¤#,##0.00;¤-#,##0.00">
-					<reportElement x="450" y="0" width="50" height="30" uuid="697fbfa0-4ee7-4636-a180-1036f25549b4"/>
-					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font size="9"/>
-					</textElement>
-					<textFieldExpression><![CDATA[$V{VentaVendedor}]]></textFieldExpression>
-				</textField>
-				<textField pattern="¤#,##0.00;¤-#,##0.00">
-					<reportElement x="500" y="0" width="50" height="30" uuid="ace1d800-c6df-41b0-89ac-33f3a51b3c48"/>
-					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font size="9"/>
-					</textElement>
-					<textFieldExpression><![CDATA[$V{GananciaVendedor}]]></textFieldExpression>
-				</textField>
-				<staticText>
-					<reportElement x="300" y="0" width="100" height="30" uuid="dad5b703-eabb-4d32-9a05-57782ea24b64">
-						<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
-					</reportElement>
-					<textElement textAlignment="Right" verticalAlignment="Middle">
-						<font size="9" isBold="true"/>
-					</textElement>
-					<text><![CDATA[Subtotal vendedor]]></text>
-				</staticText>
-			</band>
-		</groupFooter>
-	</group>
 	<group name="marcaGRP">
 		<groupExpression><![CDATA[$F{Marca}]]></groupExpression>
 		<groupHeader>
@@ -282,7 +183,7 @@ group by ventasfinal.fecha, vendedores.nombre, articulos.rubro, ventasfinal.coda
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="60" splitType="Stretch">
+		<band height="90" splitType="Stretch">
 			<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 			<textField>
 				<reportElement x="-20" y="0" width="595" height="30" uuid="4b7fd088-1cf6-4569-b078-a31d10b00a42">
@@ -302,6 +203,15 @@ group by ventasfinal.fecha, vendedores.nombre, articulos.rubro, ventasfinal.coda
 				</textElement>
 				<textFieldExpression><![CDATA[$P{fecha}]]></textFieldExpression>
 			</textField>
+			<textField isStretchWithOverflow="true" pattern="">
+				<reportElement x="-20" y="60" width="595" height="30" uuid="77834ab0-f3d5-4785-8a7e-9c2639f390a0">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="13" isBold="true" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{Vendedor} + " - " + "Zonas: " + $P{zonasString}]]></textFieldExpression>
+			</textField>
 		</band>
 	</title>
 	<detail>
@@ -320,14 +230,6 @@ group by ventasfinal.fecha, vendedores.nombre, articulos.rubro, ventasfinal.coda
 				</textElement>
 				<textFieldExpression><![CDATA[$F{Descripcion}]]></textFieldExpression>
 			</textField>
-			<textField>
-				<reportElement x="250" y="0" width="50" height="20" uuid="5f8cad83-b368-45d6-8c02-509ead47b8ad"/>
-				<box padding="0"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="8"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{Cantidad}]]></textFieldExpression>
-			</textField>
 			<textField pattern="¤#,##0.00;¤-#,##0.00">
 				<reportElement x="300" y="0" width="50" height="20" uuid="df3f5675-e917-4d26-858a-f2238734c1a4"/>
 				<box padding="0"/>
@@ -345,14 +247,6 @@ group by ventasfinal.fecha, vendedores.nombre, articulos.rubro, ventasfinal.coda
 				<textFieldExpression><![CDATA[$F{PrecioU}]]></textFieldExpression>
 			</textField>
 			<textField pattern="¤#,##0.00;¤-#,##0.00">
-				<reportElement x="400" y="0" width="50" height="20" uuid="a106c45d-4b6f-4893-8955-f5230a9dea17"/>
-				<box padding="0"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="8"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{SubtotalCosto}]]></textFieldExpression>
-			</textField>
-			<textField pattern="¤#,##0.00;¤-#,##0.00">
 				<reportElement x="450" y="0" width="50" height="20" uuid="b5c9af48-db93-48ac-9e50-2b5d432b738f"/>
 				<box padding="0"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
@@ -360,12 +254,22 @@ group by ventasfinal.fecha, vendedores.nombre, articulos.rubro, ventasfinal.coda
 				</textElement>
 				<textFieldExpression><![CDATA[$F{SubtotalVenta}]]></textFieldExpression>
 			</textField>
+			<textField pattern="###0.000;¤-#,###0.000">
+				<reportElement x="250" y="0" width="50" height="20" uuid="59dd2ae9-92fb-4b8c-8a54-e1d5dd8fd711"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{Cantidad}]]></textFieldExpression>
+			</textField>
 			<textField pattern="¤#,##0.00;¤-#,##0.00">
-				<reportElement x="500" y="0" width="50" height="20" uuid="1ab65848-9362-42cf-a06e-069d96d04bb4">
-					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
-					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
-				</reportElement>
-				<box padding="0"/>
+				<reportElement x="400" y="0" width="50" height="20" uuid="a4d850f0-0036-4c01-b1ad-343bee95fc8c"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SubtotalCosto}]]></textFieldExpression>
+			</textField>
+			<textField pattern="¤#,##0.00;¤-#,##0.00">
+				<reportElement x="500" y="0" width="50" height="20" uuid="0a544658-49be-4436-b00b-794d26f8ba99"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
@@ -374,37 +278,53 @@ group by ventasfinal.fecha, vendedores.nombre, articulos.rubro, ventasfinal.coda
 		</band>
 	</detail>
 	<summary>
-		<band height="30">
+		<band height="60">
 			<staticText>
 				<reportElement x="300" y="0" width="100" height="30" uuid="1dfe9463-cc80-4b34-9b6a-d385174c2cfa">
 					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
 				</reportElement>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="10" isBold="true"/>
+					<font size="9" isBold="true"/>
 				</textElement>
 				<text><![CDATA[TOTAL     ]]></text>
 			</staticText>
 			<textField pattern="¤#,##0.00;¤-#,##0.00">
 				<reportElement x="400" y="0" width="50" height="30" uuid="f0dc4c78-9047-4b2e-b1de-f0544f3a0196"/>
 				<textElement verticalAlignment="Middle">
-					<font isBold="true" isUnderline="false"/>
+					<font size="9" isBold="true" isUnderline="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{TotalCosto}]]></textFieldExpression>
 			</textField>
 			<textField pattern="¤#,##0.00;¤-#,##0.00">
 				<reportElement x="450" y="0" width="50" height="30" uuid="f1a00c44-39a9-4bef-86a0-8d5458c56607"/>
 				<textElement verticalAlignment="Middle">
-					<font isBold="true" isUnderline="false"/>
+					<font size="9" isBold="true" isUnderline="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{TotalVenta}]]></textFieldExpression>
 			</textField>
 			<textField pattern="¤#,##0.00;¤-#,##0.00">
 				<reportElement x="500" y="0" width="50" height="30" uuid="4d510816-a486-4ce5-a1a2-25dddd175033"/>
 				<textElement verticalAlignment="Middle">
-					<font isBold="true" isUnderline="false"/>
+					<font size="9" isBold="true" isUnderline="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{TotalGanancia}]]></textFieldExpression>
 			</textField>
+			<textField pattern="¤#,##0.00;¤-#,##0.00">
+				<reportElement x="440" y="40" width="110" height="20" uuid="06c5df84-74bf-4fd0-b442-20a4dcd42ec4">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$V{Comision}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="300" y="40" width="140" height="20" uuid="6980f1be-e816-4212-92d2-aafa9f7f3fdd">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[COMISION VENDEDOR]]></text>
+			</staticText>
 		</band>
 	</summary>
 </jasperReport>

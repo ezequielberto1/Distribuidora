@@ -1,5 +1,4 @@
 package reports;
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.text.DateFormat;
@@ -18,18 +17,18 @@ import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.view.JasperViewer;
 
 
-public class ReporteVentasGen {
+public class ReportePedidosGen {
 	
 	
- public void generate(java.util.Date fecha, ArrayList<String> zonas, String zonasString, String vendedor, BigDecimal porcentaje_comision) {
+ public void generate(java.util.Date fecha, ArrayList<String> zonas, String zonasString) {
   HashMap hm = null;
   // System.out.println("Usage: ReportGenerator ....");
 
   try {
    System.out.println("Start ....");
    // Get jasper report
-   String jrxmlFileName = "C:/IntReports/Files/ReporteVentas.jrxml";
-   String jasperFileName = "C:/IntReports/Files/ReporteVentas.jasper";
+   String jrxmlFileName = "C:/IntReports/Files/PedidosPorZona.jrxml";
+   String jasperFileName = "C:/IntReports/Files/PedidosPorZona.jasper";
   
    // Get the connection
    Connection conn = FactoryConexion.getInstancia().getConn();
@@ -40,8 +39,6 @@ public class ReporteVentasGen {
    hm.put("fecha", fecha);
    hm.put("zonas", zonas);
    hm.put("zonasString", zonasString);
-   hm.put("Vendedor", vendedor);
-   hm.put("porcentaje_comision", porcentaje_comision);
 
    // Generate jasper print
    JasperPrint jprint = (JasperPrint) JasperFillManager.fillReport(jasperFileName, hm, conn);
@@ -53,13 +50,12 @@ public class ReporteVentasGen {
    DateFormat df = new SimpleDateFormat("dd/MM/yyyy");   
    String reportDate = df.format(fecha);
    
-   jv.setTitle("Ventas " + reportDate);
+   jv.setTitle("Pedidos por zona " + reportDate);
       
    
-  }  catch (Exception e) {
+  } catch (Exception e) {
 		JOptionPane.showMessageDialog(null, e.getMessage());
 	  	SuperLogger.logger.log(Level.ERROR, e.getMessage(), e);
   }
  }
-
 }
