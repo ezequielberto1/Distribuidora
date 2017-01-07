@@ -9,16 +9,16 @@ import java.util.Arrays;
 import java.util.Vector;
 
 import javax.swing.JTable;
-import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 
+import utils.NonEditableTableModel;
 import utils.NumberRenderer;
 
 public class DataArticulos {
 	public void cargarArticulos(JTable tabla, String rubro) {
 		PreparedStatement stmt=null;
 		ResultSet rs=null;
-		DefaultTableModel model;
+		NonEditableTableModel model;
 
 		try {
 
@@ -53,7 +53,7 @@ public class DataArticulos {
 
 	}
 	
-	public static DefaultTableModel buildTableModel(ResultSet rs, ArrayList<String> col)
+	public static NonEditableTableModel buildTableModel(ResultSet rs, ArrayList<String> col)
 			throws SQLException {
 
 		// names of columns
@@ -73,7 +73,7 @@ public class DataArticulos {
 			data.add(vector);
 		}
 
-		return new DefaultTableModel(data, columnNames);
+		return new NonEditableTableModel(data, columnNames);
 
 	}
 

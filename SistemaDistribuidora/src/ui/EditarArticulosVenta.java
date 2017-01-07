@@ -18,9 +18,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
-import javax.swing.table.TableModel;
 import javax.swing.JLabel;
 
 import java.awt.Font;
@@ -49,10 +47,9 @@ import java.util.Vector;
 
 import javax.swing.ListSelectionModel;
 
+import utils.NonEditableTableModel;
 import utils.NumberRenderer;
 
-import java.awt.event.InputMethodListener;
-import java.awt.event.InputMethodEvent;
 
 public class EditarArticulosVenta {
 
@@ -600,7 +597,7 @@ public class EditarArticulosVenta {
 			JOptionPane.showMessageDialog(frame, "Seleccione una fila.");
 	}
 
-	public void actualizarTabla(DefaultTableModel model){
+	public void actualizarTabla(NonEditableTableModel model){
 		tblArticulosVenta.setModel(model);
 		TableColumnModel m = tblArticulosVenta.getColumnModel();
 		m.getColumn(2).setCellRenderer(NumberRenderer.getCurrencyRenderer());
@@ -611,7 +608,7 @@ public class EditarArticulosVenta {
 	}
 
 	public void setTablaArticulosVenta(JTable tabla){
-		TableModel tm = tabla.getModel();
+		NonEditableTableModel tm = (NonEditableTableModel)tabla.getModel();
 		tblArticulosVenta.setModel(tm);		
 		TableColumnModel m = tblArticulosVenta.getColumnModel();
 		m.getColumn(2).setCellRenderer(NumberRenderer.getCurrencyRenderer());
@@ -657,7 +654,7 @@ public class EditarArticulosVenta {
 
 	public void cargarTabla(){
 		Vector<Vector<Object>> data = new Vector<Vector<Object>>();
-		DefaultTableModel model = (DefaultTableModel)tblArticulosVenta.getModel();
+		NonEditableTableModel model = (NonEditableTableModel)tblArticulosVenta.getModel();
 		Vector<String> columnNames = new Vector<String>();
 		automatico = false;
 
@@ -713,6 +710,8 @@ public class EditarArticulosVenta {
 						encontrado = true;
 						if(articulos_venta.get(i).getCantidad()!=original.get(j).getCantidad())
 							modificado = true;
+						if(!(articulos_venta.get(i).getNombre().matches(original.get(j).getNombre())))
+							modificado = true;
 					}
 				}
 				if(encontrado == false){
@@ -738,8 +737,10 @@ public class EditarArticulosVenta {
 						encontrado = true;
 						if(articulos_venta.get(j).getCantidad()!=av_original.get(i).getCantidad()){
 							cambios = true;
-							break;
+							break;	
 						}
+						if(!(articulos_venta.get(i).getNombre().matches(av_original.get(j).getNombre())))
+							modificado = true;
 					}
 				}
 				if(encontrado == false || cambios == true){

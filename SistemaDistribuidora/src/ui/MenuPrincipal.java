@@ -93,6 +93,8 @@ public class MenuPrincipal {
 		if(abmv==null){
 			abmv = new ABMVentas();
 		}
+		abmv.cargarZonas();
+		abmv.cargarListaVentas();
 		abmv.setCaller(this);
 		abmv.show(true);
 		}

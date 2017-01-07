@@ -78,6 +78,19 @@ public class GenerarReporteVentasDia {
 
 		DataZonas.cargarTablaZonas(tblZonas);
 		
+		
+	}
+
+	/**
+	 * Initialize the contents of the frame.
+	 */
+	private void initialize() {
+		frmGenerarReporte = new JFrame();
+		frmGenerarReporte.setTitle("Reporte de ventas");
+		frmGenerarReporte.setResizable(false);
+		frmGenerarReporte.setBounds(100, 100, 160, 455);
+		frmGenerarReporte.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
 		JLabel lblVendedor = new JLabel("Vendedor:");
 		lblVendedor.setBounds(10, 67, 69, 14);
 		frmGenerarReporte.getContentPane().add(lblVendedor);
@@ -95,18 +108,6 @@ public class GenerarReporteVentasDia {
 		txtComision.setBounds(89, 123, 55, 20);
 		frmGenerarReporte.getContentPane().add(txtComision);
 		txtComision.setColumns(10);
-	}
-
-	/**
-	 * Initialize the contents of the frame.
-	 */
-	private void initialize() {
-		frmGenerarReporte = new JFrame();
-		frmGenerarReporte.setTitle("Reporte de ventas");
-		frmGenerarReporte.setResizable(false);
-		frmGenerarReporte.setBounds(100, 100, 160, 455);
-		frmGenerarReporte.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
 		
 		JButton btnGenerarReporte = new JButton("Generar");
 		

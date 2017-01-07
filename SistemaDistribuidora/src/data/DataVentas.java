@@ -12,11 +12,13 @@ import javax.swing.table.TableColumnModel;
 
 
 
+
 import org.apache.commons.lang.StringUtils;
 
 import entidades.Articulo_Venta;
 import entidades.Venta;
 import utils.ApplicationException;
+import utils.NonEditableTableModel;
 import utils.NumberRenderer;
 
 public class DataVentas {
@@ -373,7 +375,7 @@ public class DataVentas {
 		
 	}
 
-	public static DefaultTableModel buildTableModel(ResultSet rs, ArrayList<String> col)
+	public static NonEditableTableModel buildTableModel(ResultSet rs, ArrayList<String> col)
 			throws SQLException {
 
 		// names of columns
@@ -393,7 +395,7 @@ public class DataVentas {
 			data.add(vector);
 		}
 
-		return new DefaultTableModel(data, columnNames);
+		return new NonEditableTableModel(data, columnNames);
 
 	}
 

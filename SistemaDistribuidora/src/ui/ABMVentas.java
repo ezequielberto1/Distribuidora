@@ -24,14 +24,11 @@ import javax.swing.JScrollPane;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JTable;
-import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
-import javax.swing.table.TableModel;
 import javax.swing.LayoutStyle.ComponentPlacement;
 
 import com.toedter.calendar.JDateChooser;
 
-import data.DataMarcas;
 import data.DataZonas;
 import data.DataVentas;
 import entidades.Articulo_Venta;
@@ -39,7 +36,7 @@ import entidades.Venta;
 
 import javax.swing.UIManager;
 
-import utils.FormatRenderer;
+import utils.NonEditableTableModel;
 import utils.NumberRenderer;
 
 import java.awt.Color;
@@ -71,7 +68,6 @@ public class ABMVentas {
 	private JButton btnAplicarFecha;
 	private JScrollPane scrListaClientes;
 	private JPanel panel;
-	private JButton button_5;
 	private JButton button_6;
 	private JButton btnFiltrar;
 	private JButton btnGuardarCambios;
@@ -81,7 +77,6 @@ public class ABMVentas {
 	private JLabel lblCliente;
 	private JLabel lblZona;
 	private JScrollPane scrollPane;
-	private JLabel lblCampoSlo;
 	private final ButtonGroup buttonGroup = new ButtonGroup();
 	private final ButtonGroup buttonGroup_1 = new ButtonGroup();
 	private DataZonas dataZonas;
@@ -98,6 +93,8 @@ public class ABMVentas {
 	private FiltrarListaVentas flv;
 	private OrdenarLista ord;
 	private MenuPrincipal mp;
+	private JTextField txtLocalidad;
+	private JLabel lblLocalidad;
 
 
 	/**
@@ -127,8 +124,7 @@ public class ABMVentas {
 	    catch(Exception e){ 
 	    }
 		initialize();
-		cargarZonas();
-		cargarListaVentas();
+		
 		
 	}
 
@@ -149,7 +145,7 @@ public class ABMVentas {
 		lblZona.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblZona.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		
-		lblCodigo = new JLabel("N\u00BA Vta.(*)");
+		lblCodigo = new JLabel("N\u00BA Vta.");
 		lblCodigo.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblCodigo.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		
@@ -165,9 +161,6 @@ public class ABMVentas {
 		
 		cmbZona = new JComboBox();
 		
-		lblCampoSlo = new JLabel("(*) Campo s\u00F3lo para b\u00FAsqueda.");
-		lblCampoSlo.setFont(new Font("Tahoma", Font.ITALIC, 8));
-		
 		scrListaClientes = new JScrollPane();
 		
 		btnGuardarCambios = new JButton("Guardar cambios");
@@ -177,8 +170,6 @@ public class ABMVentas {
 			}
 		});
 		buttonGroup_1.add(btnGuardarCambios);
-		
-		button_5 = new JButton("Limpiar campos");
 		
 		label = new JLabel("Desde:");
 		
@@ -214,6 +205,7 @@ public class ABMVentas {
 		scrollPane = new JScrollPane();
 		
 		tblArticulosVenta = new JTable();
+		tblArticulosVenta.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tblArticulosVenta.setFont(new Font("Tahoma", Font.PLAIN, 9));
 		scrollPane.setViewportView(tblArticulosVenta);
 		
@@ -264,13 +256,11 @@ public class ABMVentas {
 					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING, false)
 						.addComponent(panel, GroupLayout.PREFERRED_SIZE, 378, GroupLayout.PREFERRED_SIZE)
 						.addGroup(groupLayout.createSequentialGroup()
-							.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING, false)
-								.addComponent(button_2, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-								.addComponent(btnGuardarCambios, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 177, Short.MAX_VALUE))
-							.addPreferredGap(ComponentPlacement.RELATED, 24, Short.MAX_VALUE)
-							.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
-								.addComponent(button_5, GroupLayout.PREFERRED_SIZE, 177, GroupLayout.PREFERRED_SIZE)
-								.addComponent(btnVolver, GroupLayout.PREFERRED_SIZE, 177, GroupLayout.PREFERRED_SIZE))
+							.addComponent(btnGuardarCambios, GroupLayout.PREFERRED_SIZE, 177, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+								.addComponent(btnVolver, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 195, Short.MAX_VALUE)
+								.addComponent(button_2, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 							.addPreferredGap(ComponentPlacement.RELATED)))
 					.addGap(10))
 				.addGroup(groupLayout.createSequentialGroup()
@@ -304,14 +294,13 @@ public class ABMVentas {
 							.addComponent(panel, GroupLayout.DEFAULT_SIZE, 436, Short.MAX_VALUE)
 							.addPreferredGap(ComponentPlacement.UNRELATED)
 							.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-								.addComponent(button_5)
-								.addComponent(btnGuardarCambios))))
+								.addComponent(btnGuardarCambios)
+								.addComponent(button_2))))
 					.addGap(11)
 					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
 						.addComponent(button_6)
 						.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
 							.addComponent(btnFiltrar)
-							.addComponent(button_2)
 							.addComponent(btnVolver)))
 					.addContainerGap())
 		);
@@ -323,40 +312,47 @@ public class ABMVentas {
 				editarArticulosVenta();
 			}
 		});
+		
+		txtLocalidad = new JTextField();
+		txtLocalidad.setColumns(10);
+		
+		lblLocalidad = new JLabel("Localidad");
+		lblLocalidad.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblLocalidad.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		GroupLayout gl_panel = new GroupLayout(panel);
 		gl_panel.setHorizontalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel.createSequentialGroup()
-					.addGap(0, 0, Short.MAX_VALUE)
-					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_panel.createSequentialGroup()
-							.addGap(27)
-							.addComponent(lblCodigo, GroupLayout.PREFERRED_SIZE, 67, GroupLayout.PREFERRED_SIZE)
-							.addGap(18)
-							.addComponent(txtNroVenta, GroupLayout.PREFERRED_SIZE, 44, GroupLayout.PREFERRED_SIZE)
-							.addGap(20)
-							.addComponent(lblFecha, GroupLayout.PREFERRED_SIZE, 48, GroupLayout.PREFERRED_SIZE)
-							.addGap(10)
-							.addComponent(dateFechaVenta, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-						.addGroup(gl_panel.createSequentialGroup()
-							.addGap(46)
-							.addComponent(lblCliente, GroupLayout.PREFERRED_SIZE, 48, GroupLayout.PREFERRED_SIZE)
-							.addGap(18)
-							.addComponent(txtCliente, GroupLayout.PREFERRED_SIZE, 209, GroupLayout.PREFERRED_SIZE))
-						.addGroup(gl_panel.createSequentialGroup()
-							.addGap(46)
-							.addComponent(lblZona, GroupLayout.PREFERRED_SIZE, 48, GroupLayout.PREFERRED_SIZE)
-							.addGap(18)
-							.addComponent(cmbZona, GroupLayout.PREFERRED_SIZE, 209, GroupLayout.PREFERRED_SIZE))
-						.addGroup(gl_panel.createSequentialGroup()
-							.addGap(4)
-							.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING, false)
-								.addGroup(gl_panel.createSequentialGroup()
-									.addComponent(lblCampoSlo)
-									.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-									.addComponent(btnEditar))
-								.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 358, GroupLayout.PREFERRED_SIZE))))
-					.addGap(4))
+					.addGap(27)
+					.addComponent(lblCodigo, GroupLayout.PREFERRED_SIZE, 67, GroupLayout.PREFERRED_SIZE)
+					.addGap(18)
+					.addComponent(txtNroVenta, GroupLayout.PREFERRED_SIZE, 44, GroupLayout.PREFERRED_SIZE)
+					.addGap(20)
+					.addComponent(lblFecha, GroupLayout.PREFERRED_SIZE, 48, GroupLayout.PREFERRED_SIZE)
+					.addGap(10)
+					.addComponent(dateFechaVenta, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+				.addGroup(gl_panel.createSequentialGroup()
+					.addGap(46)
+					.addComponent(lblCliente, GroupLayout.PREFERRED_SIZE, 48, GroupLayout.PREFERRED_SIZE)
+					.addGap(18)
+					.addComponent(txtCliente, GroupLayout.PREFERRED_SIZE, 209, GroupLayout.PREFERRED_SIZE))
+				.addGroup(gl_panel.createSequentialGroup()
+					.addGap(46)
+					.addComponent(lblLocalidad, GroupLayout.PREFERRED_SIZE, 48, GroupLayout.PREFERRED_SIZE)
+					.addGap(18)
+					.addComponent(txtLocalidad, GroupLayout.PREFERRED_SIZE, 209, GroupLayout.PREFERRED_SIZE))
+				.addGroup(gl_panel.createSequentialGroup()
+					.addGap(46)
+					.addComponent(lblZona, GroupLayout.PREFERRED_SIZE, 48, GroupLayout.PREFERRED_SIZE)
+					.addGap(18)
+					.addComponent(cmbZona, 0, 209, Short.MAX_VALUE)
+					.addGap(45))
+				.addGroup(gl_panel.createSequentialGroup()
+					.addGap(4)
+					.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 358, GroupLayout.PREFERRED_SIZE))
+				.addGroup(gl_panel.createSequentialGroup()
+					.addGap(289)
+					.addComponent(btnEditar))
 		);
 		gl_panel.setVerticalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
@@ -377,19 +373,21 @@ public class ABMVentas {
 							.addGap(3)
 							.addComponent(lblCliente))
 						.addComponent(txtCliente, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(18)
+					.addGap(15)
 					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_panel.createSequentialGroup()
 							.addGap(3)
-							.addComponent(lblZona))
+							.addComponent(lblLocalidad))
+						.addComponent(txtLocalidad, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addGap(15)
+					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+						.addComponent(lblZona)
 						.addComponent(cmbZona, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(18)
-					.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 240, Short.MAX_VALUE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
-						.addComponent(btnEditar)
-						.addComponent(lblCampoSlo, GroupLayout.PREFERRED_SIZE, 14, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap())
+					.addGap(13)
+					.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 213, Short.MAX_VALUE)
+					.addGap(6)
+					.addComponent(btnEditar)
+					.addGap(11))
 		);
 		panel.setLayout(gl_panel);
 		frmGestionVentas.getContentPane().setLayout(groupLayout);
@@ -427,6 +425,7 @@ public class ABMVentas {
 	        txtNroVenta.setText(Integer.toString(v.getNro()));
 	        txtCliente.setText(v.getCliente());
 	        dateFechaVenta.setDate(v.getFecha());
+	        txtLocalidad.setText(v.getLocalidad());
 	        cmbZona.setSelectedItem(v.getZona());
 	        dv.cargarDetalleVenta(tblArticulosVenta, v.getNro());
 			copiarArrayList(articulos_venta, dv.getArticulosVenta(nro_venta));
@@ -445,26 +444,33 @@ public class ABMVentas {
 				seleccionado = tblListaVentas.getSelectedRow();
 			}
 			else {
-				if(JOptionPane.showConfirmDialog(frmGestionVentas, "Si selecciona otra venta perderá los cambios hechos. ¿Seleccionar de todos modos?")==JOptionPane.YES_OPTION){
-					cargarDetalleVenta();
-					seleccionado = tblListaVentas.getSelectedRow();
-					modificado=false;
-					eav=null;
-				}
-				else {
-					tblListaVentas.setRowSelectionInterval(seleccionado, seleccionado);
+				if(fueModificado()){
+					if(JOptionPane.showConfirmDialog(frmGestionVentas, "Si selecciona otra venta perderá los cambios hechos. ¿Seleccionar de todos modos?")==JOptionPane.YES_OPTION){
+						cargarDetalleVenta();
+						modificado=false;
+						seleccionado = tblListaVentas.getSelectedRow();
+						eav=null;
+					}
+					else {
+						tblListaVentas.setRowSelectionInterval(seleccionado, seleccionado);
+					}
 				}
 			}
 	}
 	
 	public void modificarVenta() {
-		if(JOptionPane.showConfirmDialog(frmGestionVentas, "¿Desea guardar los cambios realizados?")==JOptionPane.YES_OPTION){
-			Venta v = mapearDeFormulario();
-			DataVentas dv = new DataVentas();
-			dv.updateVenta(v, articulos_venta);
-			modificado=false;
-			eav = null;
+		if(fueModificado()){
+			if(JOptionPane.showConfirmDialog(frmGestionVentas, "¿Desea guardar los cambios realizados?")==JOptionPane.YES_OPTION){
+				Venta v = mapearDeFormulario();
+				DataVentas dv = new DataVentas();
+				dv.updateVenta(v, articulos_venta);
+				modificado=false;
+				eav = null;
+				cargarListaVentas();
+			}
 		}
+		else
+			JOptionPane.showMessageDialog(frmGestionVentas, "No hay modificaciones para guardar.");	
 	}
 	
 	public void eliminarVenta() {
@@ -486,6 +492,7 @@ public class ABMVentas {
 		venta.setNro(ventaActual);
 		venta.setCliente(txtCliente.getText());
 		venta.setFecha(dateFechaVenta.getDate());
+		venta.setLocalidad(txtLocalidad.getText());
 		venta.setZona((String)cmbZona.getSelectedItem());
 		
 		return venta;
@@ -499,7 +506,7 @@ public class ABMVentas {
 	}
 	
 	public void setTablaArticulosVenta(JTable tabla){
-		TableModel tm = tabla.getModel();
+		NonEditableTableModel tm = (NonEditableTableModel) tabla.getModel();
 		tblArticulosVenta.setModel(tm);
 		TableColumnModel m = tblArticulosVenta.getColumnModel();
 		m.getColumn(2).setCellRenderer(NumberRenderer.getCurrencyRenderer());
@@ -566,7 +573,7 @@ public class ABMVentas {
 	}
 	
 	public void show(boolean b){
-		this.frmGestionVentas.setVisible(false);
+		this.frmGestionVentas.setVisible(b);
 	}
 	
 	public void setCaller(MenuPrincipal m){
@@ -574,7 +581,41 @@ public class ABMVentas {
 	}
 	
 	public void volver(){
-		mp.setNullABMV();
 		show(false);
+	}
+	
+	public boolean fueModificado(){
+		boolean modificado = false;
+		boolean encontrado;
+		DataVentas dv = new DataVentas();
+
+		ArrayList<Articulo_Venta> original = dv.getArticulosVenta(ventaActual);
+		if(original.size()!=articulos_venta.size())
+			modificado = true;
+		else {
+			for (int i = 0; i < articulos_venta.size(); i++) {
+				encontrado = false;
+				for (int j = 0; j < original.size(); j++) {
+					if(articulos_venta.get(i).getCodigo()==original.get(j).getCodigo()){
+						encontrado = true;
+						if(articulos_venta.get(i).getCantidad()!=original.get(j).getCantidad())
+							modificado = true;
+						if(!(articulos_venta.get(i).getNombre().matches(original.get(j).getNombre())))
+							modificado = true;
+					}
+				}
+				if(encontrado == false){
+					modificado = true;
+					break;
+				}
+			}
+		}
+		if(modificado==false){
+			Venta v = dv.getVenta(ventaActual);
+			if((v.getNro()!=Integer.parseInt(txtNroVenta.getText())) || !(v.getCliente().matches(txtCliente.getText())) || (v.getFecha().getTime()!=dateFechaVenta.getDate().getTime()) || !(v.getLocalidad().matches(txtLocalidad.getText())) || !(v.getZona().matches(cmbZona.getSelectedItem().toString())))
+				modificado = true;
+		}
+		System.out.println(modificado);
+		return modificado;
 	}
 }
