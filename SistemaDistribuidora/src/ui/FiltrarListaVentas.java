@@ -1,6 +1,7 @@
 package ui;
 
 import java.awt.EventQueue;
+import java.awt.Image;
 
 import javax.swing.JFrame;
 import javax.swing.GroupLayout;
@@ -11,6 +12,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
+import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JPanel;
@@ -66,9 +68,12 @@ public class FiltrarListaVentas {
 	 */
 	private void initialize() {
 		frmFiltrarListaVentas = new JFrame();
+		frmFiltrarListaVentas.setTitle("Filtrar");
 		frmFiltrarListaVentas.setBounds(100, 100, 171, 336);
-		frmFiltrarListaVentas.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frmFiltrarListaVentas.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		frmFiltrarListaVentas.getContentPane().setLayout(new BorderLayout(0, 0));
+		Image logo = (new ImageIcon(this.getClass().getResource("/Logo INT.png")).getImage());
+		frmFiltrarListaVentas.setIconImage(logo);
 		
 		JPanel panel = new JPanel();
 		frmFiltrarListaVentas.getContentPane().add(panel, BorderLayout.CENTER);

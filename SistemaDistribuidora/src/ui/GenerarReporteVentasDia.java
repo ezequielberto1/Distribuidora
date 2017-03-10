@@ -1,6 +1,7 @@
 package ui;
 
 import java.awt.EventQueue;
+import java.awt.Image;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
@@ -8,6 +9,7 @@ import java.util.Date;
 import javax.swing.JFrame;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -89,7 +91,9 @@ public class GenerarReporteVentasDia {
 		frmGenerarReporte.setTitle("Reporte de ventas");
 		frmGenerarReporte.setResizable(false);
 		frmGenerarReporte.setBounds(100, 100, 160, 455);
-		frmGenerarReporte.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frmGenerarReporte.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+		Image logo = (new ImageIcon(this.getClass().getResource("/Logo INT.png")).getImage());
+		frmGenerarReporte.setIconImage(logo);
 		
 		JLabel lblVendedor = new JLabel("Vendedor:");
 		lblVendedor.setBounds(10, 67, 69, 14);

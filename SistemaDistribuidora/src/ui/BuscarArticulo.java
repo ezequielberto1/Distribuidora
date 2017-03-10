@@ -1,6 +1,7 @@
 package ui;
 
 import java.awt.EventQueue;
+import java.awt.Image;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -8,6 +9,7 @@ import javax.swing.JPanel;
 import java.awt.BorderLayout;
 import java.util.Vector;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JScrollPane;
 import javax.swing.JComboBox;
@@ -26,7 +28,7 @@ import java.awt.event.ActionEvent;
 
 public class BuscarArticulo {
 
-	private JFrame frame;
+	private JFrame frmBuscarArticulo;
 	private JTable tblArticulos;
 	private JComboBox cmbMarcas;
 	private String rubro;
@@ -40,7 +42,7 @@ public class BuscarArticulo {
 			public void run() {
 				try {
 					BuscarArticulo window = new BuscarArticulo();
-					window.frame.setVisible(true);
+					window.frmBuscarArticulo.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -61,12 +63,15 @@ public class BuscarArticulo {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		frame = new JFrame();
-		frame.setBounds(100, 100, 753, 374);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frmBuscarArticulo = new JFrame();
+		frmBuscarArticulo.setTitle("Buscar articulo");
+		frmBuscarArticulo.setBounds(100, 100, 753, 374);
+		frmBuscarArticulo.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+		Image logo = (new ImageIcon(this.getClass().getResource("/Logo INT.png")).getImage());
+		frmBuscarArticulo.setIconImage(logo);
 		
 		JPanel panel = new JPanel();
-		frame.getContentPane().add(panel, BorderLayout.CENTER);
+		frmBuscarArticulo.getContentPane().add(panel, BorderLayout.CENTER);
 		panel.setLayout(null);
 		
 		JScrollPane scrollPane = new JScrollPane();
@@ -124,7 +129,7 @@ public class BuscarArticulo {
 	}
 	
 	public void show(boolean b){
-		this.frame.setVisible(b);
+		this.frmBuscarArticulo.setVisible(b);
 	}
 
 	public void setCaller(EditarArticulosVenta ea){

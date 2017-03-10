@@ -1,9 +1,11 @@
 package ui;
 
 import java.awt.EventQueue;
+import java.awt.Image;
 import java.util.ArrayList;
 import java.util.Date;
 
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -16,6 +18,7 @@ import data.DataZonas;
 
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+
 
 
 import reports.ReportePedidosGen;
@@ -74,7 +77,9 @@ public class GenerarReportePedidosDia {
 		frmGenerarReporte.setTitle("Reporte de pedidos");
 		frmGenerarReporte.setResizable(false);
 		frmGenerarReporte.setBounds(100, 100, 160, 374);
-		frmGenerarReporte.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frmGenerarReporte.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+		Image logo = (new ImageIcon(this.getClass().getResource("/Logo INT.png")).getImage());
+		frmGenerarReporte.setIconImage(logo);
 		
 		
 		JButton btnGenerarReporte = new JButton("Generar");

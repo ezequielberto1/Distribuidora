@@ -1,6 +1,7 @@
 package ui;
 
 import java.awt.EventQueue;
+import java.awt.Image;
 
 import javax.swing.JFrame;
 import javax.swing.GroupLayout;
@@ -71,7 +72,9 @@ public class OrdenarLista {
 		frmOrdenarLista.setResizable(false);
 		frmOrdenarLista.setTitle("Ordenar");
 		frmOrdenarLista.setBounds(100, 100, 312, 327);
-		frmOrdenarLista.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frmOrdenarLista.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+		Image logo = (new ImageIcon(this.getClass().getResource("/Logo INT.png")).getImage());
+		frmOrdenarLista.setIconImage(logo);
 
 		JButton btnAgregarNivel = new JButton("Agregar nivel");
 

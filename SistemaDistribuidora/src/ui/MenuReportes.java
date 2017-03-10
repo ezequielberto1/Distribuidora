@@ -1,5 +1,6 @@
 package ui;
 import java.awt.EventQueue;
+import java.awt.Image;
 
 import javax.swing.JFrame;
 
@@ -7,6 +8,7 @@ import java.awt.BorderLayout;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.UIManager;
@@ -23,7 +25,7 @@ import java.awt.event.ActionEvent;
 
 public class MenuReportes {
 
-	private JFrame frame;
+	private JFrame frmMenuDeReportes;
 	private GenerarReporteVentasDia grvd;
 	private GenerarReportePedidosDia grpd;
 	private MenuPrincipal mp;
@@ -37,7 +39,7 @@ public class MenuReportes {
 			public void run() {
 				try {
 					MenuReportes window = new MenuReportes();
-					window.frame.setVisible(true);
+					window.frmMenuDeReportes.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -62,10 +64,13 @@ public class MenuReportes {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		frame = new JFrame();
-		frame.setResizable(false);
-		frame.setBounds(100, 100, 174, 159);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frmMenuDeReportes = new JFrame();
+		frmMenuDeReportes.setTitle("Menu de reportes");
+		frmMenuDeReportes.setResizable(false);
+		frmMenuDeReportes.setBounds(100, 100, 174, 159);
+		frmMenuDeReportes.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+		Image logo = (new ImageIcon(this.getClass().getResource("/Logo INT.png")).getImage());
+		frmMenuDeReportes.setIconImage(logo);
 		
 		JButton btnGestionDeVentas = new JButton("Ventas por d\u00EDa");
 		btnGestionDeVentas.addActionListener(new ActionListener() {
@@ -82,15 +87,15 @@ public class MenuReportes {
 			}
 		});
 		btnPedidosDelDia.setBounds(0, 34, 168, 33);
-		frame.getContentPane().setLayout(null);
-		frame.getContentPane().add(btnGestionDeVentas);
-		frame.getContentPane().add(btnPedidosDelDia);
+		frmMenuDeReportes.getContentPane().setLayout(null);
+		frmMenuDeReportes.getContentPane().add(btnGestionDeVentas);
+		frmMenuDeReportes.getContentPane().add(btnPedidosDelDia);
 		
 		JLabel lblMenPrincipal = new JLabel("Generar reporte...");
 		lblMenPrincipal.setHorizontalAlignment(SwingConstants.CENTER);
 		lblMenPrincipal.setFont(new Font("Tahoma", Font.BOLD, 12));
 		lblMenPrincipal.setBounds(0, 0, 168, 33);
-		frame.getContentPane().add(lblMenPrincipal);
+		frmMenuDeReportes.getContentPane().add(lblMenPrincipal);
 		
 		JButton btnVolver = new JButton("Volver");
 		btnVolver.addActionListener(new ActionListener() {
@@ -99,7 +104,7 @@ public class MenuReportes {
 			}
 		});
 		btnVolver.setBounds(0, 98, 168, 33);
-		frame.getContentPane().add(btnVolver);
+		frmMenuDeReportes.getContentPane().add(btnVolver);
 	}
 	
 	public void generarRPD(){
@@ -121,7 +126,7 @@ public class MenuReportes {
 	}
 	
 	public void show (boolean b){
-		this.frame.setVisible(b);
+		this.frmMenuDeReportes.setVisible(b);
 	}
 	
 	public void volver(){

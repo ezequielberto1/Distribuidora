@@ -1,6 +1,7 @@
 package ui;
 
 import java.awt.EventQueue;
+import java.awt.Image;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -23,6 +24,7 @@ import javax.swing.JLabel;
 
 import java.awt.Font;
 
+import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 import javax.swing.JTextField;
@@ -53,7 +55,7 @@ import utils.NumberRenderer;
 
 public class EditarArticulosVenta {
 
-	private JFrame frame;
+	private JFrame frmEditarArticulos;
 	private JTextField txtCodigo;
 	private JTextField txtNombre;
 	private JTextField txtCantidad;
@@ -86,7 +88,7 @@ public class EditarArticulosVenta {
 			public void run() {
 				try {
 					EditarArticulosVenta window = new EditarArticulosVenta();
-					window.frame.setVisible(true);
+					window.frmEditarArticulos.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -111,12 +113,15 @@ public class EditarArticulosVenta {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		frame = new JFrame();
-		frame.setBounds(100, 100, 760, 491);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frmEditarArticulos = new JFrame();
+		frmEditarArticulos.setTitle("Editar articulos");
+		frmEditarArticulos.setBounds(100, 100, 760, 491);
+		frmEditarArticulos.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+		Image logo = (new ImageIcon(this.getClass().getResource("/Logo INT.png")).getImage());
+		frmEditarArticulos.setIconImage(logo);
 
 		JPanel panel = new JPanel();
-		frame.getContentPane().add(panel, BorderLayout.CENTER);
+		frmEditarArticulos.getContentPane().add(panel, BorderLayout.CENTER);
 
 		JScrollPane scrollPane = new JScrollPane();
 
@@ -378,17 +383,17 @@ public class EditarArticulosVenta {
 		btnGuardar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				guardar();
-				JOptionPane.showMessageDialog(frame, "Cambios guardados.");
+				JOptionPane.showMessageDialog(frmEditarArticulos, "Cambios guardados.");
 				btnGuardar.setEnabled(false);
 			}
 		});
 
 		btnBorrarCambios.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				if(JOptionPane.showConfirmDialog(frame, "Se restaurarán los artículos originales. ¿Continuar?")==JOptionPane.YES_OPTION){
+				if(JOptionPane.showConfirmDialog(frmEditarArticulos, "Se restaurarán los artículos originales. ¿Continuar?")==JOptionPane.YES_OPTION){
 					changeSelected = false;
 					borrarCambios();
-					JOptionPane.showMessageDialog(frame, "Artículos originales restaurados.");
+					JOptionPane.showMessageDialog(frmEditarArticulos, "Artículos originales restaurados.");
 					btnBorrarCambios.setEnabled(false);
 					if(cambiosNoGuardados() == true)
 						btnGuardar.setEnabled(true);
@@ -405,7 +410,7 @@ public class EditarArticulosVenta {
 	}
 
 	public void show(boolean b){
-		this.frame.setVisible(b);
+		this.frmEditarArticulos.setVisible(b);
 	}
 
 	public void setCaller(ABMVentas abm){
@@ -418,7 +423,7 @@ public class EditarArticulosVenta {
 
 	public void volver(){
 		if(cambiosNoGuardados() == true){
-			if(JOptionPane.showConfirmDialog(frame, "Los cambios no fueron guardados. Si vuelve, se cancelarán. ¿Volver de todos modos?")==JOptionPane.YES_OPTION){
+			if(JOptionPane.showConfirmDialog(frmEditarArticulos, "Los cambios no fueron guardados. Si vuelve, se cancelarán. ¿Volver de todos modos?")==JOptionPane.YES_OPTION){
 				changeSelected=false;
 				volverSinGuardar();
 				changeSelected = true;
@@ -536,13 +541,13 @@ public class EditarArticulosVenta {
 					}
 				}
 				else
-					JOptionPane.showMessageDialog(frame, "Cantidad inválida.");
+					JOptionPane.showMessageDialog(frmEditarArticulos, "Cantidad inválida.");
 			}
 			else
-				JOptionPane.showMessageDialog(frame, "Escriba un nombre para el artículo.");
+				JOptionPane.showMessageDialog(frmEditarArticulos, "Escriba un nombre para el artículo.");
 		}
 		else
-			JOptionPane.showMessageDialog(frame, "Seleccione un artículo.");
+			JOptionPane.showMessageDialog(frmEditarArticulos, "Seleccione un artículo.");
 
 		return exito;
 	}
@@ -594,7 +599,7 @@ public class EditarArticulosVenta {
 			automatico = true;
 		}
 		else
-			JOptionPane.showMessageDialog(frame, "Seleccione una fila.");
+			JOptionPane.showMessageDialog(frmEditarArticulos, "Seleccione una fila.");
 	}
 
 	public void actualizarTabla(NonEditableTableModel model){

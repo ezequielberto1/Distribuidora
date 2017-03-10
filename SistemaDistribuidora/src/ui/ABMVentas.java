@@ -1,6 +1,7 @@
 package ui;
 
 import java.awt.EventQueue;
+import java.awt.Image;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -15,6 +16,7 @@ import javax.swing.JLabel;
 import java.awt.Font;
 
 import javax.swing.ComboBoxModel;
+import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 import javax.swing.JTextField;
@@ -135,7 +137,9 @@ public class ABMVentas {
 		frmGestionVentas = new JFrame();
 		frmGestionVentas.setTitle("Gesti\u00F3n de ventas");
 		frmGestionVentas.setBounds(100, 100, 752, 594);
-		frmGestionVentas.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frmGestionVentas.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+		Image logo = (new ImageIcon(this.getClass().getResource("/Logo INT.png")).getImage());
+		frmGestionVentas.setIconImage(logo);
 		
 		panel = new JPanel();
 		panel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Detalle venta", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
