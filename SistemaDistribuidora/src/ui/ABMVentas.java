@@ -15,7 +15,6 @@ import javax.swing.JLabel;
 
 import java.awt.Font;
 
-import javax.swing.ComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
